@@ -92,7 +92,7 @@ public class ProductService {
         return new ProductDto(updatedProduct);
     }
 
-    public boolean deleteProduct(Long productId, String storeId) {
+    public boolean deleteProduct(Long productId, String storeId) throws IOException {
 
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
         if (!product.getStore().getId().equals(storeId)) {
@@ -100,6 +100,8 @@ public class ProductService {
         }
 
         if (productRepository.existsById(productId)) {
+            Path destination = Paths.get("uploads/" + product.getImagePath());
+            Files.delete(destination);
             productRepository.deleteById(productId);
             return true;
         }

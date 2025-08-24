@@ -1,5 +1,6 @@
 package com.tizo.delivery.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tizo.delivery.model.dto.ProductDto;
 import com.tizo.delivery.service.ProductService;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,19 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping(value = "/{storeId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<ProductDto> addProduct(@RequestPart("product") ProductDto productDto, @RequestPart("productImage") MultipartFile productImage, @PathVariable String storeId) throws IOException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.addProductToStore(productDto, storeId, productImage));
+    @PostMapping(value = "/{storeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductDto> addProduct(
+            @RequestPart("product") String productJson,
+            @RequestPart(value = "productImage", required = false) MultipartFile productImage,
+            @PathVariable String storeId
+    ) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        ProductDto productDto = mapper.readValue(productJson, ProductDto.class);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(productService.addProductToStore(productDto, storeId, productImage));
     }
+
 
     @PutMapping(value = "/{storeId}/{productID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductDto> updateProduct(@RequestPart("product") ProductDto productDto, @RequestPart(value = "productImage", required = false) MultipartFile productImage, @PathVariable String storeId, @PathVariable Long productID) throws IOException {
@@ -45,7 +55,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{storeId}/{productId}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId, @PathVariable String storeId) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId, @PathVariable String storeId) throws IOException {
         boolean deleted = productService.deleteProduct(productId, storeId);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
