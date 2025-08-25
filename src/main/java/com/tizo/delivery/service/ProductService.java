@@ -2,7 +2,7 @@ package com.tizo.delivery.service;
 
 import com.tizo.delivery.model.Product;
 import com.tizo.delivery.model.Store;
-import com.tizo.delivery.model.dto.ProductDto;
+import com.tizo.delivery.model.dto.product.ProductDto;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
 import org.springframework.stereotype.Service;

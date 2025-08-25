@@ -2,7 +2,7 @@ package com.tizo.delivery.util;
 
 import com.tizo.delivery.controller.OrderController;
 import com.tizo.delivery.controller.StoreController;
-import com.tizo.delivery.model.dto.OrderResponseDto;
+import com.tizo.delivery.model.dto.order.OrderResponseDto;
 import com.tizo.delivery.model.dto.PageResponse;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;

@@ -1,7 +1,7 @@
 package com.tizo.delivery.controller;
 
-import com.tizo.delivery.model.dto.OrderItemRequestDto;
-import com.tizo.delivery.model.dto.OrderResponseDto;
+import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
+import com.tizo.delivery.model.dto.order.OrderResponseDto;
 import com.tizo.delivery.model.dto.PageResponse;
 import com.tizo.delivery.service.OrderService;
 import com.tizo.delivery.util.OrderModelAssembler;

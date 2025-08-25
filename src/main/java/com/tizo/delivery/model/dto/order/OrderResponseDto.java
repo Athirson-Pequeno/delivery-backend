@@ -1,4 +1,4 @@
-package com.tizo.delivery.model.dto;
+package com.tizo.delivery.model.dto.order;
 
 import com.tizo.delivery.model.*;
 import com.tizo.delivery.model.enums.OrderStatus;

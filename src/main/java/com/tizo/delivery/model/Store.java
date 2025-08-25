@@ -8,8 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.Locale.filter;
-
 @Entity
 @Table(name = "stores")
 public class Store {
@@ -17,13 +15,6 @@ public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
-    @Column(unique = true, nullable = false)
-    private String email;
-
-    @Column(nullable = false)
-    @JsonIgnore
-    private String password;
 
     @Column(nullable = false)
     private String name;
@@ -45,13 +36,11 @@ public class Store {
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Order> orders = new HashSet<>();
 
-    @Transient
-    private Set<String> categories = new HashSet<>();
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<StoreUser> users = new HashSet<>();
 
-
-    public Store(String email, String password, String name, String address, String phoneNumber) {
-        this.email = email;
-        this.password = password;
+    public Store(String name, String address, String phoneNumber) {
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
@@ -66,22 +55,6 @@ public class Store {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getName() {
@@ -137,18 +110,21 @@ public class Store {
     }
 
     public Set<String> getCategories() {
-
         return products.stream().map(Product::getCategory)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 
-    public void setCategories(Set<String> categories) {
-        this.categories = categories;
-    }
-
     public void setOrders(Set<Order> orders) {
         this.orders = orders;
+    }
+
+    public Set<StoreUser> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<StoreUser> users) {
+        this.users = users;
     }
 
     @Override

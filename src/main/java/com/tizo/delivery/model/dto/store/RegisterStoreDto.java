@@ -1,4 +1,4 @@
-package com.tizo.delivery.model.dto;
+package com.tizo.delivery.model.dto.store;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

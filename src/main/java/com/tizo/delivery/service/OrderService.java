@@ -1,8 +1,8 @@
 package com.tizo.delivery.service;
 
 import com.tizo.delivery.model.*;
-import com.tizo.delivery.model.dto.OrderItemRequestDto;
-import com.tizo.delivery.model.dto.OrderResponseDto;
+import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
+import com.tizo.delivery.model.dto.order.OrderResponseDto;
 import com.tizo.delivery.model.dto.PageResponse;
 import com.tizo.delivery.model.enums.OrderStatus;
 import com.tizo.delivery.repository.OrderRepository;

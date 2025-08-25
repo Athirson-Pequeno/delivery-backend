@@ -1,7 +1,7 @@
 package com.tizo.delivery.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tizo.delivery.model.dto.ProductDto;
+import com.tizo.delivery.model.dto.product.ProductDto;
 import com.tizo.delivery.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

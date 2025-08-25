@@ -1,8 +1,8 @@
 package com.tizo.delivery.controller;
 
-import com.tizo.delivery.model.dto.RegisterStoreDto;
-import com.tizo.delivery.model.dto.ResponseStoreDto;
-import com.tizo.delivery.model.dto.StoreProductsDto;
+import com.tizo.delivery.model.dto.store.RegisterStoreDto;
+import com.tizo.delivery.model.dto.store.ResponseStoreDto;
+import com.tizo.delivery.model.dto.store.StoreProductsDto;
 import com.tizo.delivery.service.StoreService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

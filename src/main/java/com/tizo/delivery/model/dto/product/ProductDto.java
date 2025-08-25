@@ -1,4 +1,4 @@
-package com.tizo.delivery.model.dto;
+package com.tizo.delivery.model.dto.product;
 
 import com.tizo.delivery.model.Product;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
