@@ -26,7 +26,7 @@ public class JwtService {
     private Long accessTokenExpiration;
 
     @Value("${jwt.refresh.token.expiration}")
-    private Long refreshTokenExpiration;
+    Long refreshTokenExpiration;
 
     private final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
@@ -74,7 +74,7 @@ public class JwtService {
                     .getSubject();
         } catch (JwtException e) {
             logger.warn("Token inválido: {}", e.getMessage());
-            return null;
+            throw new JwtException("Token inválido: {}" + e.getMessage());
         }
     }
 

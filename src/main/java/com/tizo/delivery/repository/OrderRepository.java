@@ -7,6 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OrderRepository extends JpaRepository<Order, Integer> {
     Page<Order> findAllByStoreId(String storeId, Pageable pageable);
-
     Order findByIdAndStore_Id(String id, String storeId);
 }
