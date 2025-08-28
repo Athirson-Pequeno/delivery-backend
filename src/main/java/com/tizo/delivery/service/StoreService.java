@@ -60,10 +60,6 @@ public class StoreService {
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductDto> productPage = productRepository.findByStoreId(id, pageable).map(ProductDto::new);
 
-        if (productPage.isEmpty()) {
-            throw new RuntimeException("No products found for store with id: " + id);
-        }
-
         return new StoreProductsDto(store, productPage);
     }
 }

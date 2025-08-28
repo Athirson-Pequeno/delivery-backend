@@ -86,7 +86,7 @@ public class AuthService {
         saveRefreshToken(storeUser, refreshToken);
 
         // Retorna tokens para frontend
-        return new AuthResponse(accessToken, refreshToken);
+        return new AuthResponse(accessToken, refreshToken, storeUser.getStore().getId());
     }
 
     // Autenticação de login
@@ -101,14 +101,14 @@ public class AuthService {
         }
 
         // Busca usuário no banco
-        StoreUser user = storeUserRepository.findByEmail(loginRequest.email())
+        StoreUser storeUser = storeUserRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         // Gera tokens JWT
-        String accessToken = jwtService.generateAccessToken(new UserDetailsImpl(user));
-        String refreshToken = jwtService.generateRefreshToken(new UserDetailsImpl(user));
+        String accessToken = jwtService.generateAccessToken(new UserDetailsImpl(storeUser));
+        String refreshToken = jwtService.generateRefreshToken(new UserDetailsImpl(storeUser));
 
-        return new AuthResponse(accessToken, refreshToken);
+        return new AuthResponse(accessToken, refreshToken, storeUser.getStore().getId());
     }
 
     // Refresh token
@@ -116,7 +116,7 @@ public class AuthService {
         String refreshToken = request.refreshToken();
 
         // Extrai usuário do token
-        StoreUser user = storeUserRepository.findByEmail(jwtService.extractEmail(refreshToken))
+        StoreUser storeUser = storeUserRepository.findByEmail(jwtService.extractEmail(refreshToken))
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         // Busca o refresh token no banco
@@ -131,19 +131,19 @@ public class AuthService {
         }
 
         // Gera sempre um novo access token
-        String newAccessToken = jwtService.generateAccessToken(new UserDetailsImpl(user));
+        String newAccessToken = jwtService.generateAccessToken(new UserDetailsImpl(storeUser));
 
         // Rotação parcial do refresh token: só gera novo se estiver perto de expirar (ex.: 24h)
         Instant threshold = now.plusSeconds(24 * 3600); // 24h
         String newRefreshToken = refreshToken;
         if (tokenEntity.getExpiryDate().isBefore(threshold)) {
-            newRefreshToken = jwtService.generateRefreshToken(new UserDetailsImpl(user));
+            newRefreshToken = jwtService.generateRefreshToken(new UserDetailsImpl(storeUser));
             tokenEntity.setToken(newRefreshToken); // Atualiza token
             tokenEntity.setExpiryDate(now.plusMillis(jwtService.refreshTokenExpiration)); // Atualiza validade
             refreshTokenRepository.save(tokenEntity); // Salva alterações
         }
 
-        return new AuthResponse(newAccessToken, newRefreshToken);
+        return new AuthResponse(newAccessToken, newRefreshToken, storeUser.getStore().getId());
     }
 
     // Salva refresh token no banco

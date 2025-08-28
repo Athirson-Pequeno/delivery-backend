@@ -35,8 +35,7 @@ public class ApiConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -65,8 +64,11 @@ public class ApiConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("/api/v1/auth/register/**").hasAuthority("ROLE_OWNER")
-                                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh-token","api/v1/store/signing").permitAll()).sessionManagement(session ->
+                                .requestMatchers("/api/v1/auth/register/manager/**").hasAuthority("ROLE_OWNER")
+                                .requestMatchers("/api/v1/auth/register/employee/**").hasAnyAuthority("ROLE_OWNER", "ROLE_MANAGER")
+                                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh-token", "api/v1/store/signing").permitAll()
+                                .anyRequest().permitAll())
+                .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class).build();

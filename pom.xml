@@ -71,6 +71,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.mercadopago</groupId>
+            <artifactId>sdk-java</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId> <!-- para parse com Jackson -->
             <version>0.12.6</version>
