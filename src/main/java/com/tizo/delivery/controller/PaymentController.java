@@ -28,4 +28,6 @@ public class PaymentController {
     public ResponseEntity<?> getPixInfo(@PathVariable String preferenceId) {
         return paymentService.getPixInfo(preferenceId);
     }
+
+
 }

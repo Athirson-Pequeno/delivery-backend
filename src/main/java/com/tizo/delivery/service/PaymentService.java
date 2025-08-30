@@ -136,7 +136,7 @@ public class PaymentService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         PaymentCreateRequest createRequest = PaymentCreateRequest.builder()
-                .transactionAmount(transactionAmount)
+                .transactionAmount(BigDecimal.valueOf(0.01))
                 .description("Pedido #" + new Random().nextInt(100))
                 .paymentMethodId("pix")
                 .payer(PaymentPayerRequest.builder()
