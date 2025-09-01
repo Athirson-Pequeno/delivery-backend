@@ -1,5 +1,6 @@
 package com.tizo.delivery.model.dto.store;
 
+import com.tizo.delivery.model.Address;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -18,7 +19,7 @@ public record RegisterStoreDto(
 
         @NotBlank
         @Size(max = 255)
-        String address,
+        Address address,
 
         @NotBlank
         @Size(max = 15)

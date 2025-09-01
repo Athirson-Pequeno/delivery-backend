@@ -10,92 +10,40 @@ import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
 import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
 import com.tizo.delivery.model.dto.product.ProductDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.springframework.http.ResponseEntity.ok;
 
 @Service
 public class PaymentService {
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
     @Value("${api.token}")
     private String accessToken;
 
-    private ProductService productService;
+    private final ProductService productService;
+    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+
 
     public PaymentService(ProductService productService) {
         this.productService = productService;
     }
-
-    /*public ResponseEntity<Map> createPixPayment(Map<String, Object> body) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        Map<String, Object> preference = new HashMap<>();
-        preference.put("items", body.get("items"));
-        preference.put("payer", body.get("payer"));
-
-        Map<String, Object> paymentMethods = new HashMap<>();
-        //paymentMethods.put("excluded_payment_types", new Map[]{ Map.of("id", "credit_card") });
-        paymentMethods.put("installments", 1);
-        preference.put("payment_methods", paymentMethods);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(accessToken);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(preference, headers);
-
-
-        Map response = restTemplate.postForObject(
-                "https://api.mercadopago.com/checkout/preferences",
-                entity,
-                Map.class
-        );
-
-        return ResponseEntity.ok(response);
-    }
-
-    public ResponseEntity<?> generatePixQrCode(Map<String, Object> body) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        Map<String, Object> preferencePayments = new HashMap<>();
-        preferencePayments.put("transaction_amount", body.get("transaction_amount"));
-        preferencePayments.put("payment_method_id", body.get("payment_method_id"));
-        preferencePayments.put("description", body.get("description"));
-
-        Map<String, Object> payerInfos = (Map<String, Object>) body.get("payer");
-        payerInfos.put("email", payerInfos.get("email"));
-
-        preferencePayments.put("payer", payerInfos);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(accessToken);
-        headers.set("X-Idempotency-Key", UUID.randomUUID().toString());
-
-        System.out.println(preferencePayments);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(preferencePayments, headers);
-
-        Map response = restTemplate.postForObject(
-                "https://api.mercadopago.com/v1/payments",
-                entity,
-                Map.class
-        );
-
-        System.out.println(response);
-
-        return ResponseEntity.ok(response);
-    }*/
 
     public ResponseEntity<?> getPixInfo(String preferenceId) {
         RestTemplate restTemplate = new RestTemplate();
@@ -110,7 +58,6 @@ public class PaymentService {
                 entity,
                 Map.class
         );
-
         return ok(response.getBody());
     }
 
@@ -145,14 +92,55 @@ public class PaymentService {
                         .build())
                 .dateOfExpiration(OffsetDateTime.now().plusMinutes(15))
                 .build();
-
-
         try {
             return ResponseEntity.ok(client.create(createRequest, requestOptions));
         } catch (MPApiException e) {
             System.out.println("Status: " + e.getApiResponse().getStatusCode());
             System.out.println("Content: " + e.getApiResponse().getContent());
             throw e;
+        }
+    }
+
+    public SseEmitter streamPaymentStatus(@PathVariable String paymentId) {
+        SseEmitter emitter = new SseEmitter(600_000L);
+        emitters.put(paymentId, emitter);
+
+        emitter.onCompletion(() -> emitters.remove(paymentId));
+        emitter.onTimeout(() -> emitters.remove(paymentId));
+
+        try {
+            emitter.send(SseEmitter.event()
+                    .name("init")
+                    .data("Conexão aberta para pagamento " + paymentId));
+        } catch (IOException e) {
+            emitter.completeWithError(e);
+        }
+
+        return emitter;
+    }
+
+    public void handleWebhook(Map<String, Object> payload) {
+        Map<String, Object> data = (Map<String, Object>) payload.get("data");
+        String paymentId = String.valueOf(data.get("id"));
+
+        MercadoPagoConfig.setAccessToken(accessToken);
+        PaymentClient client = new PaymentClient();
+
+        try {
+            Payment response = client.get(Long.parseLong(paymentId));
+            SseEmitter emitter = emitters.get(paymentId);
+            if (emitter != null) {
+                try {
+                    response.getStatus();
+                    emitter.send(SseEmitter.event()
+                            .name("payment-update")
+                            .data(response.getStatus()));
+                } catch (IOException e) {
+                    emitter.completeWithError(e);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Erro: {}", e.getMessage());
         }
     }
 }

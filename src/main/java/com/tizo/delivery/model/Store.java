@@ -20,12 +20,16 @@ public class Store {
     private String name;
 
     @Column(nullable = false)
-    private String address;
+    @Embedded
+    private Address address;
 
     @Column(nullable = false)
     private String phoneNumber;
 
     private String description;
+
+    @Column(nullable = false, unique = true)
+    private String slug;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Product> products = new HashSet<>();
@@ -39,12 +43,6 @@ public class Store {
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<StoreUser> users = new HashSet<>();
-
-    public Store(String name, String address, String phoneNumber) {
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-    }
 
     public Store() {
     }
@@ -65,11 +63,11 @@ public class Store {
         this.name = name;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
 
@@ -95,6 +93,14 @@ public class Store {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 
     public Set<Product> getProducts() {

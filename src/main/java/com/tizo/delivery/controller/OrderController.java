@@ -24,7 +24,8 @@ public class OrderController {
     }
 
     @PostMapping("/{storeID}")
-    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody List<OrderItemRequestDto> orderItemRequestDtoList, @PathVariable String storeID) {
+    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody List<OrderItemRequestDto> orderItemRequestDtoList,
+                                                        @PathVariable String storeID) {
         OrderResponseDto order = orderService.createOrder(storeID, orderItemRequestDtoList);
         return ResponseEntity.status(201).body(order);
     }
@@ -40,7 +41,6 @@ public class OrderController {
         return ResponseEntity.ok(model);
     }
 
-
     @GetMapping("/{storeID}/{orderID}")
     public ResponseEntity<EntityModel<OrderResponseDto>> getOrderById(
             @PathVariable String storeID,
@@ -54,5 +54,4 @@ public class OrderController {
 
         return ResponseEntity.ok(model);
     }
-
 }
