@@ -36,7 +36,7 @@ public class StoreController {
     }
 
     @GetMapping("/by-slug/{slug}")
-    public ResponseEntity<StoreProductsDto> findBySlug(@PathVariable String slug, @RequestParam(defaultValue = "0") @Min(0) Integer page, @RequestParam(defaultValue = "100") @Max(50) Integer size) {
+    public ResponseEntity<StoreProductsDto> findBySlug(@PathVariable String slug, @RequestParam(defaultValue = "0") @Min(0) Integer page, @RequestParam(defaultValue = "50") @Max(50) Integer size) {
         StoreProductsDto store = storeService.getBySlug(slug, page, size);
         if (store == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
