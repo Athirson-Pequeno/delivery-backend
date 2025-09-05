@@ -1,6 +1,7 @@
 package com.tizo.delivery.service;
 
 import com.tizo.delivery.model.Product;
+import com.tizo.delivery.model.ProductExtras;
 import com.tizo.delivery.model.Store;
 import com.tizo.delivery.model.dto.product.ProductDto;
 import com.tizo.delivery.repository.ProductRepository;
@@ -14,7 +15,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -38,13 +41,26 @@ public class ProductService {
         product.setDescription(productDto.description());
         product.setPrice(productDto.price());
         product.setCategory(productDto.category());
-
+        product.setExtras(productDto.productExtras());
         Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
 
         if (productImage != null && !productImage.isEmpty()) {
             product.setImagePath(createFileUrl(productImage));
         }
         product.setStore(store);
+
+        Set<ProductExtras> extras = productDto.productExtras().stream()
+                .map(extraDto -> {
+                    ProductExtras extra = new ProductExtras();
+                    extra.setName(extraDto.getName());
+                    extra.setValue(extraDto.getValue());
+                    extra.setLimit(extraDto.getLimit());
+                    extra.setProduct(product);
+                    return extra;
+                })
+                .collect(Collectors.toSet());
+
+        product.setExtras(extras);
 
         Product createdProduct = productRepository.save(product);
 
@@ -60,7 +76,6 @@ public class ProductService {
         }
         return new ProductDto(product);
     }
-
 
     public List<ProductDto> getProductByStoreId(String storeId) {
 
@@ -90,6 +105,11 @@ public class ProductService {
         Product updatedProduct = productRepository.save(product);
 
         return new ProductDto(updatedProduct);
+    }
+
+    public void addExtra(Product product, Set<ProductExtras> extras) {
+
+
     }
 
     public boolean deleteProduct(Long productId, String storeId) throws IOException {

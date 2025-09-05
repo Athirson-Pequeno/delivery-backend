@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -23,6 +24,9 @@ public class Product {
     @JoinColumn(name = "store_id")
     @JsonIgnore
     private Store store;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductExtras> extras;
 
     public Product() {
     }
@@ -81,6 +85,14 @@ public class Product {
 
     public void setStore(Store store) {
         this.store = store;
+    }
+
+    public Set<ProductExtras> getExtras() {
+        return extras;
+    }
+
+    public void setExtras(Set<ProductExtras> extras) {
+        this.extras = extras;
     }
 
     @Override

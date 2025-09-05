@@ -86,7 +86,7 @@ public class AuthService {
         saveRefreshToken(storeUser, refreshToken);
 
         // Retorna tokens para frontend
-        return new AuthResponse(accessToken, refreshToken, storeUser.getStore().getId());
+        return new AuthResponse(accessToken, refreshToken, storeUser.getStore().getId(), storeUser.getStore().getSlug());
     }
 
     // Autenticação de login
@@ -108,7 +108,7 @@ public class AuthService {
         String accessToken = jwtService.generateAccessToken(new UserDetailsImpl(storeUser));
         String refreshToken = jwtService.generateRefreshToken(new UserDetailsImpl(storeUser));
 
-        return new AuthResponse(accessToken, refreshToken, storeUser.getStore().getId());
+        return new AuthResponse(accessToken, refreshToken, storeUser.getStore().getId(), storeUser.getStore().getSlug());
     }
 
     // Refresh token
@@ -143,7 +143,7 @@ public class AuthService {
             refreshTokenRepository.save(tokenEntity); // Salva alterações
         }
 
-        return new AuthResponse(newAccessToken, newRefreshToken, storeUser.getStore().getId());
+        return new AuthResponse(newAccessToken, newRefreshToken, storeUser.getStore().getId(), storeUser.getStore().getSlug());
     }
 
     // Salva refresh token no banco
