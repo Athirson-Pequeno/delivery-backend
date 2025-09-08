@@ -1,9 +1,10 @@
 package com.tizo.delivery.service;
 
 import com.tizo.delivery.model.*;
+import com.tizo.delivery.model.dto.PageResponse;
 import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
-import com.tizo.delivery.model.dto.PageResponse;
+import com.tizo.delivery.model.dto.order.ProductOrdersExtras;
 import com.tizo.delivery.model.enums.OrderStatus;
 import com.tizo.delivery.repository.OrderRepository;
 import com.tizo.delivery.repository.ProductRepository;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -33,7 +36,6 @@ public class OrderService {
     public OrderResponseDto createOrder(String storeId, List<OrderItemRequestDto> items) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
-
 
         Order order = new Order();
         order.setStore(store);
@@ -53,6 +55,26 @@ public class OrderService {
             orderItem.setProductName(product.getName());
             orderItem.setTotalPrice(product.getPrice() * itemDto.quantity());
             orderItem.setOrder(order);
+            orderItem.setExtras(
+                    (product.getExtras() == null ? Set.<ProductExtras>of() : product.getExtras())
+                            .stream()
+                            // filtra apenas os extras que o cliente escolheu
+                            .filter(extra -> itemDto.extras() != null &&
+                                    itemDto.extras().stream()
+                                            .anyMatch(e -> e.extraId().equals(extra.getId())))
+                            // mapeia para OrdemItemExtra copiando dados e adicionando a quantidade escolhida
+                            .map(extra -> {
+                                // pega a quantidade escolhida do DTO
+                                Long quantity = itemDto.extras().stream()
+                                        .filter(e -> e.extraId().equals(extra.getId()))
+                                        .map(ProductOrdersExtras::extraQuantity)
+                                        .findFirst()
+                                        .orElse(0L); // default 0 caso não encontre
+                                return new OrdemItemExtra(extra.getName(), extra.getValue(), extra.getLimit(), quantity);
+                            })
+                            .collect(Collectors.toSet())
+            );
+
             return orderItem;
         }).toList();
 

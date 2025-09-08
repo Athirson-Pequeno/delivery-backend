@@ -3,12 +3,13 @@ package com.tizo.delivery.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "order_items")
 public class OrderItem {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +26,13 @@ public class OrderItem {
     private Integer quantity;
     private Double totalPrice;
 
+    @ElementCollection
+    @CollectionTable(
+            name = "order_item_extras",
+            joinColumns = @JoinColumn(name = "order_item_id")
+    )
+    private Set<OrdemItemExtra> extras = new HashSet<>();
+
     public OrderItem() {
     }
 
@@ -36,6 +44,15 @@ public class OrderItem {
         this.quantity = quantity;
         this.totalPrice = totalPrice;
     }
+
+    public Set<OrdemItemExtra> getExtras() {
+        return extras;
+    }
+
+    public void setExtras(Set<OrdemItemExtra> productExtras) {
+        this.extras = productExtras;
+    }
+
 
     public Long getId() {
         return id;

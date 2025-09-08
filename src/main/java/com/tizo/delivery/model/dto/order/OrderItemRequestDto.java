@@ -1,4 +1,6 @@
 package com.tizo.delivery.model.dto.order;
 
-public record OrderItemRequestDto(Long productId, Integer quantity) {
+import java.util.Set;
+
+public record OrderItemRequestDto(Long productId, Integer quantity, Set<ProductOrdersExtras> extras) {
 }
