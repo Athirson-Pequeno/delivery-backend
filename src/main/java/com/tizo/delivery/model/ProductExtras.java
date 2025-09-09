@@ -74,11 +74,11 @@ public class ProductExtras {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ProductExtras that)) return false;
-        return Objects.equals(id, that.id);
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hash(id, name);
     }
 }

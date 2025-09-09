@@ -6,6 +6,7 @@ import com.tizo.delivery.model.Store;
 import com.tizo.delivery.model.dto.product.ProductDto;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +36,7 @@ public class ProductService {
         }
     }
 
+    @Transactional
     public ProductDto addProductToStore(ProductDto productDto, String storeId, MultipartFile productImage) throws IOException {
         Product product = new Product();
         product.setName(productDto.name());
@@ -43,6 +45,7 @@ public class ProductService {
         product.setCategory(productDto.category());
         product.setExtras(productDto.productExtras());
         Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
+
 
         if (productImage != null && !productImage.isEmpty()) {
             product.setImagePath(createFileUrl(productImage));
@@ -60,9 +63,13 @@ public class ProductService {
                 })
                 .collect(Collectors.toSet());
 
+
         product.setExtras(extras);
 
+        product.getExtras().forEach(extra -> System.out.println(extra.getName()));
+
         Product createdProduct = productRepository.save(product);
+
 
         return new ProductDto(createdProduct);
 
