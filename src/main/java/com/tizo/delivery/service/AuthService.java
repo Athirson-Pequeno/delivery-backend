@@ -108,6 +108,8 @@ public class AuthService {
         String accessToken = jwtService.generateAccessToken(new UserDetailsImpl(storeUser));
         String refreshToken = jwtService.generateRefreshToken(new UserDetailsImpl(storeUser));
 
+        saveRefreshToken(storeUser, refreshToken);
+
         return new AuthResponse(accessToken, refreshToken, storeUser.getStore().getId(), storeUser.getStore().getSlug());
     }
 
