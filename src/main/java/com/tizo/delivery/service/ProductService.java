@@ -127,8 +127,10 @@ public class ProductService {
         }
 
         if (productRepository.existsById(productId)) {
-            Path destination = Paths.get("uploads/" + product.getImagePath());
-            Files.delete(destination);
+            if(product.getImagePath() != null) {
+                Path destination = Paths.get("uploads/" + product.getImagePath());
+                Files.delete(destination);
+            }
             productRepository.deleteById(productId);
             return true;
         }

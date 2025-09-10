@@ -74,7 +74,7 @@ public class JwtService {
                     .getSubject();
         } catch (JwtException e) {
             logger.warn("Token inválido: {}", e.getMessage());
-            throw new JwtException("Token inválido: {}" + e.getMessage());
+            throw new JwtException("Token inválido: " + e.getMessage());
         }
     }
 

@@ -56,8 +56,8 @@ public class ApiConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers("/api/v1/auth/register/manager/**").hasAuthority("ROLE_OWNER")
-                                .requestMatchers("/api/v1/auth/register/employee/**").hasAnyAuthority("ROLE_OWNER", "ROLE_MANAGER")
-                                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh-token", "api/v1/store/signing").permitAll()
+                                .requestMatchers("/api/v1/auth/register/employee/**", "/api/v1/product/**").hasAnyAuthority("ROLE_OWNER", "ROLE_MANAGER")
+                                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh-token", "/api/v1/store/signing").permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Permite requisições OPTIONS
                                 .anyRequest().permitAll())
                 .sessionManagement(session ->
