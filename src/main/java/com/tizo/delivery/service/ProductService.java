@@ -25,19 +25,15 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
-    private final Path uploadDirectory = Paths.get("uploads/images/products");
 
     public ProductService(ProductRepository productRepository, StoreRepository storeRepository) throws IOException {
         this.productRepository = productRepository;
         this.storeRepository = storeRepository;
-
-        if (!Files.exists(uploadDirectory)) {
-            Files.createDirectories(uploadDirectory);
-        }
     }
 
     @Transactional
     public ProductDto addProductToStore(ProductDto productDto, String storeId, MultipartFile productImage) throws IOException {
+
         Product product = new Product();
         product.setName(productDto.name());
         product.setDescription(productDto.description());
@@ -46,9 +42,8 @@ public class ProductService {
         product.setExtras(productDto.productExtras());
         Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
 
-
         if (productImage != null && !productImage.isEmpty()) {
-            product.setImagePath(createFileUrl(productImage));
+            product.setImagePath(createFileUrl(productImage, store.getSlug()));
         }
         product.setStore(store);
 
@@ -63,16 +58,11 @@ public class ProductService {
                 })
                 .collect(Collectors.toSet());
 
-
         product.setExtras(extras);
-
-        product.getExtras().forEach(extra -> System.out.println(extra.getName()));
 
         Product createdProduct = productRepository.save(product);
 
-
         return new ProductDto(createdProduct);
-
     }
 
     public ProductDto getProductById(String storeId, Long productId) {
@@ -106,17 +96,12 @@ public class ProductService {
         product.setCategory(productDto.category());
 
         if (productImage != null && !productImage.isEmpty()) {
-            product.setImagePath(createFileUrl(productImage));
+            product.setImagePath(createFileUrl(productImage, product.getStore().getSlug()));
         }
 
         Product updatedProduct = productRepository.save(product);
 
         return new ProductDto(updatedProduct);
-    }
-
-    public void addExtra(Product product, Set<ProductExtras> extras) {
-
-
     }
 
     public boolean deleteProduct(Long productId, String storeId) throws IOException {
@@ -127,7 +112,7 @@ public class ProductService {
         }
 
         if (productRepository.existsById(productId)) {
-            if(product.getImagePath() != null) {
+            if (product.getImagePath() != null) {
                 Path destination = Paths.get("uploads/" + product.getImagePath());
                 Files.delete(destination);
             }
@@ -137,11 +122,17 @@ public class ProductService {
         return false;
     }
 
-    private String createFileUrl(MultipartFile file) throws IOException {
+    private String createFileUrl(MultipartFile file, String storeSlug) throws IOException {
+        Path uploadDirectory = Paths.get("uploads/images/products/" + storeSlug);
+
+        if (!Files.exists(uploadDirectory)) {
+            Files.createDirectories(uploadDirectory);
+        }
+
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path destination = uploadDirectory.resolve(fileName);
         Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        return "images/products/" + fileName;
+        return "images/products/" + storeSlug + "/" + fileName;
     }
 
     public List<String> getAllCategories(String storeId) {
