@@ -1,7 +1,6 @@
 package com.tizo.delivery.service;
 
 
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
@@ -65,17 +64,14 @@ public class JwtService {
     }
 
     public String extractEmail(String token) {
-        try {
-            return Jwts.parser()
+
+        return Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload()
                     .getSubject();
-        } catch (JwtException e) {
-            logger.warn("Token inválido: {}", e.getMessage());
-            throw new JwtException("Token inválido: " + e.getMessage());
-        }
+
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

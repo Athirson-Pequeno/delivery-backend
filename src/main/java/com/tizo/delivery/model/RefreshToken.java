@@ -1,6 +1,7 @@
 package com.tizo.delivery.model;
 
 import jakarta.persistence.*;
+
 import java.time.Instant;
 import java.util.Objects;
 
@@ -14,13 +15,12 @@ public class RefreshToken {
     @Column(nullable = false, unique = true)
     private String token;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private StoreUser user;
 
     @Column(nullable = false)
     private Instant expiryDate;
-
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

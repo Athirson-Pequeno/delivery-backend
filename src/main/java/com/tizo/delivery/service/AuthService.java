@@ -1,5 +1,6 @@
 package com.tizo.delivery.service;
 
+import com.tizo.delivery.exception.exceptions.UnauthorizedException;
 import com.tizo.delivery.model.RefreshToken;
 import com.tizo.delivery.model.Store;
 import com.tizo.delivery.model.StoreUser;
@@ -12,6 +13,7 @@ import com.tizo.delivery.repository.RefreshTokenRepository;
 import com.tizo.delivery.repository.StoreRepository;
 import com.tizo.delivery.repository.StoreUserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -114,39 +116,55 @@ public class AuthService {
     }
 
     // Refresh token
+    @Transactional
     public AuthResponse refreshToken(RefreshRequest request) {
-        String refreshToken = request.refreshToken();
-
-        // Extrai usuário do token
-        StoreUser storeUser = storeUserRepository.findByEmail(jwtService.extractEmail(refreshToken))
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        // Busca o refresh token no banco
-        RefreshToken tokenEntity = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
-
-        // Verifica expiração do refresh token
+        String oldRefreshToken = request.refreshToken();
         Instant now = Instant.now();
+
+        // 1. Verifica se o refresh token existe no banco
+        RefreshToken tokenEntity = refreshTokenRepository.findByToken(oldRefreshToken)
+                .orElseThrow(() -> new UnauthorizedException("Unauthorized"));
+
+        // 2. Verifica se já expirou
         if (tokenEntity.getExpiryDate().isBefore(now)) {
-            refreshTokenRepository.delete(tokenEntity); // Deleta token expirado
-            throw new RuntimeException("Refresh token expired");
+            refreshTokenRepository.delete(tokenEntity); // remove token expirado
+            throw new UnauthorizedException("Unauthorized");
         }
 
-        // Gera sempre um novo access token
-        String newAccessToken = jwtService.generateAccessToken(new UserDetailsImpl(storeUser));
-
-        // Rotação parcial do refresh token: só gera novo se estiver perto de expirar (ex.: 24h)
-        Instant threshold = now.plusSeconds(24 * 3600); // 24h
-        String newRefreshToken = refreshToken;
-        if (tokenEntity.getExpiryDate().isBefore(threshold)) {
-            newRefreshToken = jwtService.generateRefreshToken(new UserDetailsImpl(storeUser));
-            tokenEntity.setToken(newRefreshToken); // Atualiza token
-            tokenEntity.setExpiryDate(now.plusMillis(jwtService.refreshTokenExpiration)); // Atualiza validade
-            refreshTokenRepository.save(tokenEntity); // Salva alterações
+        // 3. Busca usuário associado
+        StoreUser storeUser = tokenEntity.getUser();
+        if (storeUser == null) {
+            refreshTokenRepository.delete(tokenEntity); // token corrompido
+            throw new UnauthorizedException("Unauthorized");
         }
 
-        return new AuthResponse(newAccessToken, newRefreshToken, storeUser.getStore().getId(), storeUser.getStore().getSlug());
+        // 4. Gera novo access token
+        UserDetailsImpl userDetails = new UserDetailsImpl(storeUser);
+        String newAccessToken = jwtService.generateAccessToken(userDetails);
+
+        // 5. Rotação total do refresh token
+        String newRefreshToken = jwtService.generateRefreshToken(userDetails);
+
+        // Invalida todos tokens anteriores do usuário (garante apenas 1 ativo)
+        refreshTokenRepository.deleteByUser(storeUser);
+        refreshTokenRepository.flush();
+
+        // Salva o novo refresh token
+        RefreshToken newTokenEntity = new RefreshToken();
+        newTokenEntity.setToken(newRefreshToken);
+        newTokenEntity.setUser(storeUser);
+        newTokenEntity.setExpiryDate(now.plusMillis(jwtService.refreshTokenExpiration));
+        refreshTokenRepository.save(newTokenEntity);
+
+        // 6. Retorna novos tokens
+        return new AuthResponse(
+                newAccessToken,
+                newRefreshToken,
+                storeUser.getStore().getId(),
+                storeUser.getStore().getSlug()
+        );
     }
+
 
     // Salva refresh token no banco
     private void saveRefreshToken(StoreUser storeUser, String token) {
