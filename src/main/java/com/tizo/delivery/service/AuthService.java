@@ -92,6 +92,7 @@ public class AuthService {
     }
 
     // Autenticação de login
+    @Transactional
     public AuthResponse authenticate(AuthCredentials loginRequest) {
         try {
             // Valida credenciais usando AuthenticationManager
@@ -109,6 +110,10 @@ public class AuthService {
         // Gera tokens JWT
         String accessToken = jwtService.generateAccessToken(new UserDetailsImpl(storeUser));
         String refreshToken = jwtService.generateRefreshToken(new UserDetailsImpl(storeUser));
+
+        // Invalida todos tokens anteriores do usuário (garante apenas 1 ativo)
+        refreshTokenRepository.deleteByUser(storeUser);
+        refreshTokenRepository.flush();
 
         saveRefreshToken(storeUser, refreshToken);
 
