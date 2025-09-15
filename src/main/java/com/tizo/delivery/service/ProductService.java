@@ -2,6 +2,7 @@ package com.tizo.delivery.service;
 
 import com.tizo.delivery.model.Product;
 import com.tizo.delivery.model.ProductExtras;
+import com.tizo.delivery.model.ProductExtrasGroup;
 import com.tizo.delivery.model.Store;
 import com.tizo.delivery.model.dto.product.ProductDto;
 import com.tizo.delivery.repository.ProductRepository;
@@ -11,14 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -33,37 +33,49 @@ public class ProductService {
 
     @Transactional
     public ProductDto addProductToStore(ProductDto productDto, String storeId, MultipartFile productImage) throws IOException {
-
         Product product = new Product();
         product.setName(productDto.name());
         product.setDescription(productDto.description());
         product.setPrice(productDto.price());
         product.setCategory(productDto.category());
-        product.setExtras(productDto.productExtras());
-        Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
+        product.setStore(store);
 
         if (productImage != null && !productImage.isEmpty()) {
             product.setImagePath(createFileUrl(productImage, store.getSlug()));
         }
-        product.setStore(store);
 
-        Set<ProductExtras> extras = productDto.productExtras().stream()
-                .map(extraDto -> {
-                    ProductExtras extra = new ProductExtras();
-                    extra.setName(extraDto.getName());
-                    extra.setValue(extraDto.getValue());
-                    extra.setLimit(extraDto.getLimit());
-                    extra.setProduct(product);
-                    return extra;
-                })
-                .collect(Collectors.toSet());
+        // Montar grupos + extras
+        List<ProductExtrasGroup> groups = productDto.extrasGroups().stream().map(groupDto -> {
+            ProductExtrasGroup group = new ProductExtrasGroup();
+            group.setName(groupDto.name());
+            group.setMinSelections(groupDto.minSelections());
+            group.setMaxSelections(groupDto.maxSelections());
+            group.setProduct(product);
 
-        product.setExtras(extras);
+            List<ProductExtras> extras = groupDto.extras().stream().map(extraDto -> {
+                ProductExtras extra = new ProductExtras();
+                extra.setName(extraDto.name());
+                extra.setValue(extraDto.value() != null ? BigDecimal.valueOf(extraDto.value()) : null);
+                extra.setLimit(extraDto.limit());
+                extra.setActive(extraDto.active() != null ? extraDto.active() : true);
+                extra.setProduct(product);
+                extra.setExtraGroup(group);
+                return extra;
+            }).toList();
+
+            group.setExtras(extras);
+            return group;
+        }).toList();
+
+        product.setExtrasGroups(groups);
 
         Product createdProduct = productRepository.save(product);
-
         return new ProductDto(createdProduct);
     }
+
 
     public ProductDto getProductById(String storeId, Long productId) {
         Product product = productRepository.findById(productId)

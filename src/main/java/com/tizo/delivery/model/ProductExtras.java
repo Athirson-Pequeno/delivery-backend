@@ -23,6 +23,12 @@ public class ProductExtras {
     @Column(name = "extra_limit")
     private Long limit;
 
+    private Boolean active = true;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "extras_group_id")
+    private ProductExtrasGroup extraGroup;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     @JsonBackReference
@@ -69,6 +75,22 @@ public class ProductExtras {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public ProductExtrasGroup getExtraGroup() {
+        return extraGroup;
+    }
+
+    public void setExtraGroup(ProductExtrasGroup extraGroup) {
+        this.extraGroup = extraGroup;
     }
 
     @Override

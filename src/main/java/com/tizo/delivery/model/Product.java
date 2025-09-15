@@ -3,8 +3,9 @@ package com.tizo.delivery.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -26,7 +27,11 @@ public class Product {
     private Store store;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ProductExtras> extras;
+    private List<ProductExtras> extras;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductExtrasGroup> extrasGroups = new ArrayList<>();
+
 
     public Product() {
     }
@@ -87,12 +92,20 @@ public class Product {
         this.store = store;
     }
 
-    public Set<ProductExtras> getExtras() {
+    public List<ProductExtras> getExtras() {
         return extras;
     }
 
-    public void setExtras(Set<ProductExtras> extras) {
+    public void setExtras(List<ProductExtras> extras) {
         this.extras = extras;
+    }
+
+    public List<ProductExtrasGroup> getExtrasGroups() {
+        return extrasGroups;
+    }
+
+    public void setExtrasGroups(List<ProductExtrasGroup> extrasGroups) {
+        this.extrasGroups = extrasGroups;
     }
 
     @Override

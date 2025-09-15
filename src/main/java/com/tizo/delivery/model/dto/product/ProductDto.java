@@ -1,13 +1,12 @@
 package com.tizo.delivery.model.dto.product;
 
 import com.tizo.delivery.model.Product;
-import com.tizo.delivery.model.ProductExtras;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Set;
+import java.util.List;
 
 public record ProductDto(Long id, String name, String description, Double price, String imagePath, String category,
-                         Set<ProductExtras> productExtras) {
+                         List<ProductExtrasGroupDto> extrasGroups) {
     public ProductDto(Product product) {
         this(
                 product.getId(),
@@ -16,6 +15,6 @@ public record ProductDto(Long id, String name, String description, Double price,
                 product.getPrice(),
                 ServletUriComponentsBuilder.fromCurrentContextPath().toUriString().concat("/") + product.getImagePath(),
                 product.getCategory(),
-                product.getExtras());
+                product.getExtrasGroups().stream().map(ProductExtrasGroupDto::new).toList());
     }
 }
