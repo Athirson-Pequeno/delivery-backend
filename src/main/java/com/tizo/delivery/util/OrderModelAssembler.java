@@ -3,7 +3,7 @@ package com.tizo.delivery.util;
 import com.tizo.delivery.controller.OrderController;
 import com.tizo.delivery.controller.StoreController;
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
-import com.tizo.delivery.model.dto.PageResponse;
+import com.tizo.delivery.model.dto.PageResponseDto;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 
@@ -29,15 +29,15 @@ public class OrderModelAssembler {
         );
     }
 
-    public PagedModel<EntityModel<OrderResponseDto>> toPagedModel(PageResponse<OrderResponseDto> pageResponse, String storeId, Integer page, Integer size) {
-        List<EntityModel<OrderResponseDto>> content = pageResponse.content().stream()
+    public PagedModel<EntityModel<OrderResponseDto>> toPagedModel(PageResponseDto<OrderResponseDto> pageResponseDto, String storeId, Integer page, Integer size) {
+        List<EntityModel<OrderResponseDto>> content = pageResponseDto.content().stream()
                 .map(dto -> toModel(dto, storeId, page, size))
                 .collect(Collectors.toList());
 
         return PagedModel.of(content, new PagedModel.PageMetadata(
-                pageResponse.size(),
-                pageResponse.page(),
-                pageResponse.totalElements()
+                pageResponseDto.size(),
+                pageResponseDto.page(),
+                pageResponseDto.totalElements()
         ));
     }
 }

@@ -7,6 +7,7 @@ import com.tizo.delivery.model.Store;
 import com.tizo.delivery.model.dto.product.ProductDto;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
+import com.tizo.delivery.util.SlugGenerator;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,10 +26,12 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
+    private final SlugGenerator slugGenerator;
 
-    public ProductService(ProductRepository productRepository, StoreRepository storeRepository) throws IOException {
+    public ProductService(ProductRepository productRepository, StoreRepository storeRepository, SlugGenerator slugGenerator) {
         this.productRepository = productRepository;
         this.storeRepository = storeRepository;
+        this.slugGenerator = slugGenerator;
     }
 
     @Transactional
@@ -38,9 +41,13 @@ public class ProductService {
         product.setDescription(productDto.description());
         product.setPrice(productDto.price());
         product.setCategory(productDto.category());
+        product.setProductSize(productDto.productSizes());
+
+        product.getProductSize().forEach(size -> size.setProduct(product));
 
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
+
         product.setStore(store);
 
         if (productImage != null && !productImage.isEmpty()) {
@@ -48,6 +55,7 @@ public class ProductService {
         }
 
         // Montar grupos + extras
+        if (productDto.extrasGroups() != null && !productDto.extrasGroups().isEmpty()) {
         List<ProductExtrasGroup> groups = productDto.extrasGroups().stream().map(groupDto -> {
             ProductExtrasGroup group = new ProductExtrasGroup();
             group.setName(groupDto.name());
@@ -70,7 +78,8 @@ public class ProductService {
             return group;
         }).toList();
 
-        product.setExtrasGroups(groups);
+            product.setExtrasGroups(groups);
+        }
 
         Product createdProduct = productRepository.save(product);
         return new ProductDto(createdProduct);
@@ -141,7 +150,7 @@ public class ProductService {
             Files.createDirectories(uploadDirectory);
         }
 
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String fileName = UUID.randomUUID() + "_" + slugGenerator.generateSlug(file.getOriginalFilename());
         Path destination = uploadDirectory.resolve(fileName);
         Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
         return "images/products/" + storeSlug + "/" + fileName;

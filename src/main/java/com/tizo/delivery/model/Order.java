@@ -36,7 +36,7 @@ public class Order {
     private List<OrderItem> items;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private CustomerInfos customerInfos;
+    private CustomerInfo customerInfo;
 
     public Order() {
     }
@@ -105,12 +105,12 @@ public class Order {
         this.items = items;
     }
 
-    public CustomerInfos getCustomerInfos() {
-        return customerInfos;
+    public CustomerInfo getCustomerInfos() {
+        return customerInfo;
     }
 
-    public void setCustomerInfos(CustomerInfos customerInfos) {
-        this.customerInfos = customerInfos;
+    public void setCustomerInfos(CustomerInfo customerInfo) {
+        this.customerInfo = customerInfo;
     }
 
     @Override

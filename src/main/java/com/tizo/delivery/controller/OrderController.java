@@ -2,7 +2,7 @@ package com.tizo.delivery.controller;
 
 import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
-import com.tizo.delivery.model.dto.PageResponse;
+import com.tizo.delivery.model.dto.PageResponseDto;
 import com.tizo.delivery.service.OrderService;
 import com.tizo.delivery.util.OrderModelAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -36,7 +36,7 @@ public class OrderController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
-        PageResponse<OrderResponseDto> orders = orderService.getOrdersByStoreId(storeID, page, size);
+        PageResponseDto<OrderResponseDto> orders = orderService.getOrdersByStoreId(storeID, page, size);
         PagedModel<EntityModel<OrderResponseDto>> model = assembler.toPagedModel(orders, storeID, page, size);
         return ResponseEntity.ok(model);
     }

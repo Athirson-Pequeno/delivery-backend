@@ -37,7 +37,7 @@ public class StoreService {
     public ResponseStoreDto createStore(RegisterStoreDto registerStoreDto) {
         Store store = new Store();
         store.setName(registerStoreDto.name());
-        store.setSlug(slugGenerator.generateSlug(registerStoreDto.name()));
+        store.setSlug(slugGenerator.generateStoreSlug(registerStoreDto.name()));
         store.setAddress(registerStoreDto.address());
         store.setPhoneNumber(registerStoreDto.phoneNumber());
 

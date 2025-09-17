@@ -18,7 +18,7 @@ public record OrderResponseDto(
         LocalDateTime updatedAt,
         Payment payment,
         Delivery delivery,
-        CustomerInfos customerInfos,
+        CustomerInfo customerInfo,
         List<OrderItem> orderItems) {
 
     public OrderResponseDto(Order order) {

@@ -32,6 +32,9 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductExtrasGroup> extrasGroups = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductSize> productSize;
+
 
     public Product() {
     }
@@ -98,6 +101,14 @@ public class Product {
 
     public void setExtras(List<ProductExtras> extras) {
         this.extras = extras;
+    }
+
+    public List<ProductSize> getProductSize() {
+        return productSize;
+    }
+
+    public void setProductSize(List<ProductSize> productSize) {
+        this.productSize = productSize;
     }
 
     public List<ProductExtrasGroup> getExtrasGroups() {

@@ -21,6 +21,11 @@ public class SlugGenerator {
         this.storeRepository = storeRepository;
     }
 
+    public String generateStoreSlug(String input) {
+        // Gerar slug único
+        return generateUniqueSlug(generateSlug(input));
+    }
+
     public String generateSlug(String input) {
         if (input == null) {
             throw new IllegalArgumentException("Input não pode ser nulo");
@@ -47,11 +52,10 @@ public class SlugGenerator {
 
         // Se ficar vazio, usar um valor padrão
         if (slug.isEmpty()) {
-            slug = "store";
+            slug = "slug";
         }
 
-        // Gerar slug único
-        return generateUniqueSlug(slug);
+        return slug;
     }
 
     private String generateUniqueSlug(String baseSlug) {

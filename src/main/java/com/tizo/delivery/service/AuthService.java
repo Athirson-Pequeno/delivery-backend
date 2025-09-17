@@ -5,9 +5,9 @@ import com.tizo.delivery.model.RefreshToken;
 import com.tizo.delivery.model.Store;
 import com.tizo.delivery.model.StoreUser;
 import com.tizo.delivery.model.UserDetailsImpl;
-import com.tizo.delivery.model.dto.auth.AuthCredentials;
-import com.tizo.delivery.model.dto.auth.AuthResponse;
-import com.tizo.delivery.model.dto.auth.RefreshRequest;
+import com.tizo.delivery.model.dto.auth.AuthCredentialsDto;
+import com.tizo.delivery.model.dto.auth.AuthResponseDto;
+import com.tizo.delivery.model.dto.auth.RefreshRequestDto;
 import com.tizo.delivery.model.enums.StoreUserRole;
 import com.tizo.delivery.repository.RefreshTokenRepository;
 import com.tizo.delivery.repository.StoreRepository;
@@ -49,19 +49,19 @@ public class AuthService {
     }
 
     // Registro de gerente
-    public AuthResponse registerManager(AuthCredentials registerRequest, String storeId) {
+    public AuthResponseDto registerManager(AuthCredentialsDto registerRequest, String storeId) {
         // Delegando para método genérico com role MANAGER
         return registerManager(registerRequest, storeId, StoreUserRole.MANAGER);
     }
 
     // Registro de funcionário
-    public AuthResponse registerEmployee(AuthCredentials registerRequest, String storeId) {
+    public AuthResponseDto registerEmployee(AuthCredentialsDto registerRequest, String storeId) {
         // Delegando para método genérico com role EMPLOYEE
         return registerManager(registerRequest, storeId, StoreUserRole.EMPLOYEE);
     }
 
     // Método genérico de registro
-    public AuthResponse registerManager(AuthCredentials registerRequest, String storeId, StoreUserRole storeUserRole) {
+    public AuthResponseDto registerManager(AuthCredentialsDto registerRequest, String storeId, StoreUserRole storeUserRole) {
         // Valida se email já está cadastrado
         if (storeUserRepository.existsByEmail(registerRequest.email())) {
             throw new RuntimeException("Email já cadastrado");
@@ -88,12 +88,12 @@ public class AuthService {
         saveRefreshToken(storeUser, refreshToken);
 
         // Retorna tokens para frontend
-        return new AuthResponse(accessToken, refreshToken, storeUser.getStore().getId(), storeUser.getStore().getSlug());
+        return new AuthResponseDto(accessToken, refreshToken, storeUser.getStore().getId(), storeUser.getStore().getSlug());
     }
 
     // Autenticação de login
     @Transactional
-    public AuthResponse authenticate(AuthCredentials loginRequest) {
+    public AuthResponseDto authenticate(AuthCredentialsDto loginRequest) {
         try {
             // Valida credenciais usando AuthenticationManager
             authenticationManager.authenticate(
@@ -117,12 +117,12 @@ public class AuthService {
 
         saveRefreshToken(storeUser, refreshToken);
 
-        return new AuthResponse(accessToken, refreshToken, storeUser.getStore().getId(), storeUser.getStore().getSlug());
+        return new AuthResponseDto(accessToken, refreshToken, storeUser.getStore().getId(), storeUser.getStore().getSlug());
     }
 
     // Refresh token
     @Transactional
-    public AuthResponse refreshToken(RefreshRequest request) {
+    public AuthResponseDto refreshToken(RefreshRequestDto request) {
         String oldRefreshToken = request.refreshToken();
         Instant now = Instant.now();
 
@@ -162,7 +162,7 @@ public class AuthService {
         refreshTokenRepository.save(newTokenEntity);
 
         // 6. Retorna novos tokens
-        return new AuthResponse(
+        return new AuthResponseDto(
                 newAccessToken,
                 newRefreshToken,
                 storeUser.getStore().getId(),

@@ -6,8 +6,7 @@ import jakarta.persistence.Embeddable;
 import java.math.BigDecimal;
 
 @Embeddable
-public class OrdemItemExtra {
-
+public class OrderItemExtra {
 
     private String name;
 
@@ -19,10 +18,10 @@ public class OrdemItemExtra {
 
     private Long quantity;
 
-    public OrdemItemExtra() {
+    public OrderItemExtra() {
     }
 
-    public OrdemItemExtra(String name, BigDecimal value, Long limit, Long quantity) {
+    public OrderItemExtra(String name, BigDecimal value, Long limit, Long quantity) {
         this.name = name;
         this.value = value;
         this.limit = limit;

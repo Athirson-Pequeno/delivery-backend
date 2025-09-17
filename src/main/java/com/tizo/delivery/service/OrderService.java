@@ -1,10 +1,10 @@
 package com.tizo.delivery.service;
 
 import com.tizo.delivery.model.*;
-import com.tizo.delivery.model.dto.PageResponse;
+import com.tizo.delivery.model.dto.PageResponseDto;
 import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
-import com.tizo.delivery.model.dto.order.ProductOrdersExtras;
+import com.tizo.delivery.model.dto.order.ProductOrdersExtrasDto;
 import com.tizo.delivery.model.enums.OrderStatus;
 import com.tizo.delivery.repository.OrderRepository;
 import com.tizo.delivery.repository.ProductRepository;
@@ -62,15 +62,15 @@ public class OrderService {
                             .filter(extra -> itemDto.extras() != null &&
                                     itemDto.extras().stream()
                                             .anyMatch(e -> e.extraId().equals(extra.getId())))
-                            // mapeia para OrdemItemExtra copiando dados e adicionando a quantidade escolhida
+                            // mapeia para OrderItemExtra copiando dados e adicionando a quantidade escolhida
                             .map(extra -> {
                                 // pega a quantidade escolhida do DTO
                                 Long quantity = itemDto.extras().stream()
                                         .filter(e -> e.extraId().equals(extra.getId()))
-                                        .map(ProductOrdersExtras::extraQuantity)
+                                        .map(ProductOrdersExtrasDto::extraQuantity)
                                         .findFirst()
                                         .orElse(0L); // default 0 caso não encontre
-                                return new OrdemItemExtra(extra.getName(), extra.getValue(), extra.getLimit(), quantity);
+                                return new OrderItemExtra(extra.getName(), extra.getValue(), extra.getLimit(), quantity);
                             })
                             .collect(Collectors.toSet())
             );
@@ -82,7 +82,7 @@ public class OrderService {
 
         order.setPayment(order.getPayment() == null ? new Payment() : order.getPayment());
         order.setDelivery(order.getDelivery() == null ? new Delivery() : order.getDelivery());
-        order.setCustomerInfos(order.getCustomerInfos() == null ? new CustomerInfos() : order.getCustomerInfos());
+        order.setCustomerInfos(order.getCustomerInfos() == null ? new CustomerInfo() : order.getCustomerInfos());
 
         BigDecimal totalValue = BigDecimal.valueOf(orderItems.stream().mapToDouble(OrderItem::getTotalPrice).sum());
         order.getPayment().setFinalAmount(totalValue);
@@ -90,7 +90,7 @@ public class OrderService {
         return new OrderResponseDto(orderRepository.save(order));
     }
 
-    public PageResponse<OrderResponseDto> getOrdersByStoreId(String storeId, Integer page, Integer size) {
+    public PageResponseDto<OrderResponseDto> getOrdersByStoreId(String storeId, Integer page, Integer size) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
 
@@ -101,7 +101,7 @@ public class OrderService {
                 .map(OrderResponseDto::new)
                 .toList();
 
-        return new PageResponse<>(dtos, orderPage);
+        return new PageResponseDto<>(dtos, orderPage);
     }
 
     public OrderResponseDto getOrderById(String storeID, String orderID) {

@@ -6,7 +6,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "customer_infos")
-public class CustomerInfos {
+public class CustomerInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +17,10 @@ public class CustomerInfos {
     @Embedded
     private Address address;
 
-    public CustomerInfos() {
+    public CustomerInfo() {
     }
 
-    public CustomerInfos(String name, Address address, String phoneNumber) {
+    public CustomerInfo(String name, Address address, String phoneNumber) {
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
@@ -60,7 +60,7 @@ public class CustomerInfos {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof CustomerInfos that)) return false;
+        if (!(object instanceof CustomerInfo that)) return false;
         return Objects.equals(id, that.id);
     }
 

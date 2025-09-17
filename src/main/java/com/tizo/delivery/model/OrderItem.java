@@ -31,7 +31,7 @@ public class OrderItem {
             name = "order_item_extras",
             joinColumns = @JoinColumn(name = "order_item_id")
     )
-    private Set<OrdemItemExtra> extras = new HashSet<>();
+    private Set<OrderItemExtra> extras = new HashSet<>();
 
     public OrderItem() {
     }
@@ -45,11 +45,11 @@ public class OrderItem {
         this.totalPrice = totalPrice;
     }
 
-    public Set<OrdemItemExtra> getExtras() {
+    public Set<OrderItemExtra> getExtras() {
         return extras;
     }
 
-    public void setExtras(Set<OrdemItemExtra> productExtras) {
+    public void setExtras(Set<OrderItemExtra> productExtras) {
         this.extras = productExtras;
     }
 
