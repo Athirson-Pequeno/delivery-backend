@@ -14,13 +14,13 @@ public class ProductSize {
     private Long id;
 
     @Column(name = "size_name", nullable = false)
-    private String sizeName = "unico";
+    private String sizeName = "único";
 
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
     @Column(name = "size", nullable = false)
-    private String size = "unico";
+    private String size = "único";
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
@@ -28,6 +28,10 @@ public class ProductSize {
     private Product product;
 
     public ProductSize() {
+    }
+
+    public ProductSize(BigDecimal price) {
+        this.price = price;
     }
 
     public Long getId() {

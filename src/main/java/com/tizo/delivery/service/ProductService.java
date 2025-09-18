@@ -1,9 +1,6 @@
 package com.tizo.delivery.service;
 
-import com.tizo.delivery.model.Product;
-import com.tizo.delivery.model.ProductExtras;
-import com.tizo.delivery.model.ProductExtrasGroup;
-import com.tizo.delivery.model.Store;
+import com.tizo.delivery.model.*;
 import com.tizo.delivery.model.dto.product.ProductDto;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
@@ -18,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,6 +40,13 @@ public class ProductService {
         product.setPrice(productDto.price());
         product.setCategory(productDto.category());
         product.setProductSize(productDto.productSizes());
+
+        if (product.getProductSize() == null) {
+            List<ProductSize> defaultSize = new ArrayList<>();
+            defaultSize.add(new ProductSize(BigDecimal.valueOf(productDto.price())));
+            defaultSize.forEach(System.out::println);
+            product.setProductSize(defaultSize);
+        }
 
         product.getProductSize().forEach(size -> size.setProduct(product));
 
