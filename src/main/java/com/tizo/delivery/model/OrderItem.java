@@ -3,6 +3,7 @@ package com.tizo.delivery.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -20,39 +21,19 @@ public class OrderItem {
     @JsonIgnore
     private Order order;
 
+    private String size;
+    private String sizeDescription;
+
     private Long productId;
     private String productName;
-    private Double unitPrice;
+    private BigDecimal unitPrice;
     private Integer quantity;
-    private Double totalPrice;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "order_item_extras",
-            joinColumns = @JoinColumn(name = "order_item_id")
-    )
+    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderItemExtra> extras = new HashSet<>();
 
     public OrderItem() {
     }
-
-    public OrderItem(Order order, Long productId, String productName, Double unitPrice, Integer quantity, Double totalPrice) {
-        this.order = order;
-        this.productId = productId;
-        this.productName = productName;
-        this.unitPrice = unitPrice;
-        this.quantity = quantity;
-        this.totalPrice = totalPrice;
-    }
-
-    public Set<OrderItemExtra> getExtras() {
-        return extras;
-    }
-
-    public void setExtras(Set<OrderItemExtra> productExtras) {
-        this.extras = productExtras;
-    }
-
 
     public Long getId() {
         return id;
@@ -86,12 +67,31 @@ public class OrderItem {
         this.productName = productName;
     }
 
-    public Double getUnitPrice() {
+    public BigDecimal getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(Double unitPrice) {
+    public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    @Transient
+    public BigDecimal getSubtotal() {
+        if (unitPrice == null || quantity == null) return BigDecimal.ZERO;
+        return unitPrice.multiply(BigDecimal.valueOf(quantity));
+    }
+
+    @Transient
+    public BigDecimal getExtrasTotal() {
+        return extras.stream()
+                .map(OrderItemExtra::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .multiply(BigDecimal.valueOf(quantity));
+    }
+
+    @Transient
+    public BigDecimal getTotal() {
+        return getSubtotal().add(getExtrasTotal());
     }
 
     public Integer getQuantity() {
@@ -102,12 +102,28 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    public Double getTotalPrice() {
-        return totalPrice;
+    public Set<OrderItemExtra> getExtras() {
+        return extras;
     }
 
-    public void setTotalPrice(Double totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setExtras(Set<OrderItemExtra> extras) {
+        this.extras = extras;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getSizeDescription() {
+        return sizeDescription;
+    }
+
+    public void setSizeDescription(String sizeDescription) {
+        this.sizeDescription = sizeDescription;
     }
 
     @Override
@@ -120,4 +136,5 @@ public class OrderItem {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
 }

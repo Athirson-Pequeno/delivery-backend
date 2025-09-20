@@ -4,9 +4,10 @@ import com.tizo.delivery.model.Product;
 import com.tizo.delivery.model.ProductSize;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-public record ProductDto(Long id, String name, String description, Double price, String imagePath, String category,
+public record ProductDto(Long id, String name, String description, BigDecimal price, String imagePath, String category,
                          List<ProductSize> productSizes, List<ProductExtrasGroupDto> extrasGroups) {
     public ProductDto(Product product) {
         this(

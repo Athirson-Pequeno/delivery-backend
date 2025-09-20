@@ -77,7 +77,7 @@ public class PaymentService {
         BigDecimal transactionAmount = orderItems.stream()
                 .map(orderItem -> {
                     ProductDto product = productService.getProductById(storeId, orderItem.productId());
-                    return BigDecimal.valueOf(product.price())
+                    return product.price()
                             .multiply(BigDecimal.valueOf(orderItem.quantity()));
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

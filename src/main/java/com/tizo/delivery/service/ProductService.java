@@ -43,7 +43,7 @@ public class ProductService {
 
         if (product.getProductSize() == null) {
             List<ProductSize> defaultSize = new ArrayList<>();
-            defaultSize.add(new ProductSize(BigDecimal.valueOf(productDto.price())));
+            defaultSize.add(new ProductSize(productDto.price()));
             defaultSize.forEach(System.out::println);
             product.setProductSize(defaultSize);
         }

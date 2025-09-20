@@ -51,9 +51,14 @@ public class OrderService {
             OrderItem orderItem = new OrderItem();
             orderItem.setProductId(itemDto.productId());
             orderItem.setQuantity(itemDto.quantity());
-            orderItem.setUnitPrice(product.getPrice());
+            orderItem.setSize(itemDto.productSize().getSize());
+            orderItem.setSizeDescription(itemDto.productSize().getSizeName());
+            orderItem.setUnitPrice(product.getProductSize().stream()
+                    .filter(size -> size.getId().equals(itemDto.productSize().getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Size not found with id: " + itemDto.productSize().getId()))
+                    .getPrice());
             orderItem.setProductName(product.getName());
-            orderItem.setTotalPrice(product.getPrice() * itemDto.quantity());
             orderItem.setOrder(order);
             orderItem.setExtras(
                     (product.getExtras() == null ? Set.<ProductExtras>of() : product.getExtras())
@@ -70,7 +75,7 @@ public class OrderService {
                                         .map(ProductOrdersExtrasDto::extraQuantity)
                                         .findFirst()
                                         .orElse(0L); // default 0 caso não encontre
-                                return new OrderItemExtra(extra.getName(), extra.getValue(), extra.getLimit(), quantity);
+                                return new OrderItemExtra(extra.getName(), extra.getValue(), extra.getLimit(), quantity, orderItem);
                             })
                             .collect(Collectors.toSet())
             );
@@ -84,7 +89,7 @@ public class OrderService {
         order.setDelivery(order.getDelivery() == null ? new Delivery() : order.getDelivery());
         order.setCustomerInfos(order.getCustomerInfos() == null ? new CustomerInfo() : order.getCustomerInfos());
 
-        BigDecimal totalValue = BigDecimal.valueOf(orderItems.stream().mapToDouble(OrderItem::getTotalPrice).sum());
+        BigDecimal totalValue = orderItems.stream().map(OrderItem::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
         order.getPayment().setFinalAmount(totalValue);
 
         return new OrderResponseDto(orderRepository.save(order));

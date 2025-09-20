@@ -50,6 +50,7 @@ public class OrderController {
         if (orderDto == null) {
             return ResponseEntity.notFound().build();
         }
+
         EntityModel<OrderResponseDto> model = assembler.toModel(orderDto, storeID);
 
         return ResponseEntity.ok(model);
