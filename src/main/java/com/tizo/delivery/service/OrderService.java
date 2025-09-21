@@ -33,11 +33,12 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
-    public OrderResponseDto createOrder(String storeId, List<OrderItemRequestDto> items) {
+    public OrderResponseDto createOrder(String storeId, String orderId, List<OrderItemRequestDto> items) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
 
         Order order = new Order();
+        order.setId(orderId);
         order.setStore(store);
         order.setOrderStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());

@@ -23,10 +23,11 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping("/{storeID}")
+    @PostMapping("/{storeID}/{orderID}")
     public ResponseEntity<OrderResponseDto> createOrder(@RequestBody List<OrderItemRequestDto> orderItemRequestDtoList,
-                                                        @PathVariable String storeID) {
-        OrderResponseDto order = orderService.createOrder(storeID, orderItemRequestDtoList);
+                                                        @PathVariable String storeID,
+                                                        @PathVariable String orderID) {
+        OrderResponseDto order = orderService.createOrder(storeID, orderID, orderItemRequestDtoList);
         return ResponseEntity.status(201).body(order);
     }
 
