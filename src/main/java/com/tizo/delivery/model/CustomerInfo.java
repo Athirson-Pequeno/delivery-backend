@@ -15,15 +15,9 @@ public class CustomerInfo {
     private String phoneNumber;
 
     @Embedded
-    private Address address;
+    private CustomerAddress address;
 
     public CustomerInfo() {
-    }
-
-    public CustomerInfo(String name, Address address, String phoneNumber) {
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
     }
 
     public Long getId() {
@@ -42,11 +36,11 @@ public class CustomerInfo {
         this.name = name;
     }
 
-    public Address getAddress() {
+    public CustomerAddress getAddress() {
         return address;
     }
 
-    public void setAddress(Address address) {
+    public void setAddress(CustomerAddress address) {
         this.address = address;
     }
 

@@ -16,11 +16,9 @@ public record OrderResponseDto(
         String id,
         String storeName,
         OrderStatus orderStatus,
-        BigDecimal totalValue,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         Payment payment,
-        Delivery delivery,
         CustomerInfo customerInfo,
         List<OrderItemResponse> orderItems) {
 
@@ -29,11 +27,9 @@ public record OrderResponseDto(
                 order.getId(),
                 order.getStore().getName(),
                 order.getOrderStatus(),
-                order.getPayment().getFinalAmount(),
                 order.getCreatedAt(),
                 order.getUpdatedAt(),
                 order.getPayment(),
-                order.getDelivery(),
                 order.getCustomerInfos(),
                 order.getItems().stream().map(OrderItemResponse::fromEntity).collect(Collectors.toList())
         );

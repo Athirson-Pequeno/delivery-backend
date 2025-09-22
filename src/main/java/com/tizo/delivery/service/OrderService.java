@@ -2,10 +2,11 @@ package com.tizo.delivery.service;
 
 import com.tizo.delivery.model.*;
 import com.tizo.delivery.model.dto.PageResponseDto;
-import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
+import com.tizo.delivery.model.dto.order.OrderRequestDto;
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
 import com.tizo.delivery.model.dto.order.ProductOrdersExtrasDto;
 import com.tizo.delivery.model.enums.OrderStatus;
+import com.tizo.delivery.model.enums.PaymentStatus;
 import com.tizo.delivery.repository.OrderRepository;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
@@ -33,7 +34,7 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
-    public OrderResponseDto createOrder(String storeId, String orderId, List<OrderItemRequestDto> items) {
+    public OrderResponseDto createOrder(String storeId, String orderId, OrderRequestDto orderRequestDto) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
 
@@ -43,10 +44,11 @@ public class OrderService {
         order.setOrderStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
+        order.setCustomerInfos(orderRequestDto.customerInfo());
 
         List<OrderItem> orderItems;
 
-        orderItems = items.stream().map(itemDto -> {
+        orderItems = orderRequestDto.items().stream().map(itemDto -> {
             Product product = productRepository.findById(itemDto.productId())
                     .orElseThrow(() -> new RuntimeException("Product not found with id: " + itemDto.productId()));
             OrderItem orderItem = new OrderItem();
@@ -86,12 +88,15 @@ public class OrderService {
 
         order.setItems(orderItems);
 
-        order.setPayment(order.getPayment() == null ? new Payment() : order.getPayment());
-        order.setDelivery(order.getDelivery() == null ? new Delivery() : order.getDelivery());
-        order.setCustomerInfos(order.getCustomerInfos() == null ? new CustomerInfo() : order.getCustomerInfos());
+        order.setPayment(new Payment());
 
         BigDecimal totalValue = orderItems.stream().map(OrderItem::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
-        order.getPayment().setFinalAmount(totalValue);
+        order.getPayment().setTotalAmount(totalValue);
+        order.getPayment().setMethod(orderRequestDto.payment().getMethod());
+        order.getPayment().setPaymentStatus(PaymentStatus.PENDING);
+        order.getPayment().setFee(BigDecimal.ZERO);
+        order.getPayment().setDiscount(BigDecimal.ZERO);
+        order.getPayment().setFinalAmount(totalValue.subtract(order.getPayment().getDiscount()).add(order.getPayment().getFee()));
 
         return new OrderResponseDto(orderRepository.save(order));
     }

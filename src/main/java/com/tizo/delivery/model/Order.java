@@ -28,9 +28,6 @@ public class Order {
     @Embedded
     private Payment payment;
 
-    @Embedded
-    private Delivery delivery;
-
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;
 
@@ -86,14 +83,6 @@ public class Order {
 
     public void setPayment(Payment payment) {
         this.payment = payment;
-    }
-
-    public Delivery getDelivery() {
-        return delivery;
-    }
-
-    public void setDelivery(Delivery delivery) {
-        this.delivery = delivery;
     }
 
     public List<OrderItem> getItems() {

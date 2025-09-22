@@ -1,6 +1,7 @@
 package com.tizo.delivery.controller;
 
 import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
+import com.tizo.delivery.model.dto.order.OrderRequestDto;
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
 import com.tizo.delivery.model.dto.PageResponseDto;
 import com.tizo.delivery.service.OrderService;
@@ -24,10 +25,10 @@ public class OrderController {
     }
 
     @PostMapping("/{storeID}/{orderID}")
-    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody List<OrderItemRequestDto> orderItemRequestDtoList,
+    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderRequestDto orderRequestDto,
                                                         @PathVariable String storeID,
                                                         @PathVariable String orderID) {
-        OrderResponseDto order = orderService.createOrder(storeID, orderID, orderItemRequestDtoList);
+        OrderResponseDto order = orderService.createOrder(storeID, orderID, orderRequestDto);
         return ResponseEntity.status(201).body(order);
     }
 
