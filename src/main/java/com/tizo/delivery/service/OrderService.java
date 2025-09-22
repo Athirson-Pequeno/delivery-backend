@@ -45,6 +45,7 @@ public class OrderService {
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
         order.setCustomerInfos(orderRequestDto.customerInfo());
+        order.setObservation(orderRequestDto.observation());
 
         List<OrderItem> orderItems;
 
@@ -94,9 +95,10 @@ public class OrderService {
         order.getPayment().setTotalAmount(totalValue);
         order.getPayment().setMethod(orderRequestDto.payment().getMethod());
         order.getPayment().setPaymentStatus(PaymentStatus.PENDING);
-        order.getPayment().setFee(BigDecimal.ZERO);
+        order.getPayment().setFee(orderRequestDto.payment().getFee());
         order.getPayment().setDiscount(BigDecimal.ZERO);
         order.getPayment().setFinalAmount(totalValue.subtract(order.getPayment().getDiscount()).add(order.getPayment().getFee()));
+        order.getPayment().setChange(orderRequestDto.payment().getChange());
 
         return new OrderResponseDto(orderRepository.save(order));
     }

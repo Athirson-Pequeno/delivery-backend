@@ -7,6 +7,7 @@ import java.util.List;
 
 public record OrderRequestDto(
         CustomerInfo customerInfo,
+        String observation,
         Payment payment,
         List<OrderItemRequestDto> items
 ) {

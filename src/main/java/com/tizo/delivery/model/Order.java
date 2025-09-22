@@ -25,6 +25,8 @@ public class Order {
 
     private LocalDateTime updatedAt;
 
+    private String observation;
+
     @Embedded
     private Payment payment;
 
@@ -99,6 +101,14 @@ public class Order {
 
     public void setCustomerInfos(CustomerInfo customerInfo) {
         this.customerInfo = customerInfo;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 
     @Override

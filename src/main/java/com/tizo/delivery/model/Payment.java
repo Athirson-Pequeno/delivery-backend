@@ -2,6 +2,7 @@ package com.tizo.delivery.model;
 
 import com.tizo.delivery.model.enums.PaymentMethod;
 import com.tizo.delivery.model.enums.PaymentStatus;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,6 +21,9 @@ public class Payment {
     private BigDecimal discount;
     private BigDecimal fee;
     private BigDecimal finalAmount;
+
+    @Column(name = "order_change")
+    private BigDecimal change;
 
     public Payment() {
     }
@@ -79,5 +83,13 @@ public class Payment {
 
     public void setFinalAmount(BigDecimal finalAmount) {
         this.finalAmount = finalAmount;
+    }
+
+    public BigDecimal getChange() {
+        return change;
+    }
+
+    public void setChange(BigDecimal change) {
+        this.change = change;
     }
 }
