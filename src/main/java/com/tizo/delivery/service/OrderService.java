@@ -10,6 +10,7 @@ import com.tizo.delivery.model.enums.PaymentStatus;
 import com.tizo.delivery.repository.OrderRepository;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,11 +35,18 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
+    @Transactional
     public OrderResponseDto createOrder(String storeId, String orderId, OrderRequestDto orderRequestDto) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
 
-        Order order = new Order();
+        if (orderRepository.existsOrderById(orderId)) {
+            orderRepository.deleteOrderById(orderId);
+            orderRepository.flush();
+        }
+
+        Order order = orderRepository.getOrderById(orderId).orElse(new Order());
+
         order.setId(orderId);
         order.setStore(store);
         order.setOrderStatus(OrderStatus.PENDING);
@@ -47,9 +55,7 @@ public class OrderService {
         order.setCustomerInfos(orderRequestDto.customerInfo());
         order.setObservation(orderRequestDto.observation());
 
-        List<OrderItem> orderItems;
-
-        orderItems = orderRequestDto.items().stream().map(itemDto -> {
+        List<OrderItem> orderItems = orderRequestDto.items().stream().map(itemDto -> {
             Product product = productRepository.findById(itemDto.productId())
                     .orElseThrow(() -> new RuntimeException("Product not found with id: " + itemDto.productId()));
             OrderItem orderItem = new OrderItem();
@@ -81,11 +87,11 @@ public class OrderService {
                                         .orElse(0L); // default 0 caso não encontre
                                 return new OrderItemExtra(extra.getName(), extra.getValue(), extra.getLimit(), quantity, orderItem);
                             })
-                            .collect(Collectors.toSet())
+                            .collect(Collectors.toCollection(java.util.HashSet::new))
             );
 
             return orderItem;
-        }).toList();
+        }).collect(Collectors.toCollection(java.util.ArrayList::new));
 
         order.setItems(orderItems);
 

@@ -4,6 +4,7 @@ import com.tizo.delivery.model.enums.OrderStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,7 +32,7 @@ public class Order {
     private Payment payment;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> items;
+    private List<OrderItem> items = new ArrayList<>();
 
     @ManyToOne(cascade = CascadeType.ALL)
     private CustomerInfo customerInfo;
