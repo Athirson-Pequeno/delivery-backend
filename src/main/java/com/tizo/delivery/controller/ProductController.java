@@ -31,38 +31,38 @@ public class ProductController {
         ObjectMapper mapper = new ObjectMapper();
         ProductDto productDto = mapper.readValue(productJson, ProductDto.class);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(productService.addProductToStore(productDto, storeId, productImage));
+        ProductDto createdProduct = productService.addProductToStore(productDto, storeId, productImage);
+        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 
 
     @PutMapping(value = "/{storeId}/{productID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductDto> updateProduct(@RequestPart("product") ProductDto productDto, @RequestPart(value = "productImage", required = false) MultipartFile productImage, @PathVariable String storeId, @PathVariable Long productID) throws IOException {
         ProductDto updatedProduct = productService.updateProduct(productDto, productID, storeId, productImage);
-        return ResponseEntity.ok(updatedProduct);
+        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
 
     @GetMapping("/{storeId}")
     public ResponseEntity<List<ProductDto>> getProductsByStoreId(@PathVariable String storeId) {
         List<ProductDto> product = productService.getProductByStoreId(storeId);
-        return ResponseEntity.ok(product);
+        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
     @GetMapping("/{storeId}/{productId}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable String storeId, @PathVariable Long productId) {
         ProductDto product = productService.getProductById(storeId, productId);
-        return ResponseEntity.ok(product);
+        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
     @DeleteMapping("/{storeId}/{productId}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId, @PathVariable String storeId) throws IOException {
+    public ResponseEntity<?> deleteProduct(@PathVariable Long productId, @PathVariable String storeId) throws IOException {
         boolean deleted = productService.deleteProduct(productId, storeId);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        return deleted ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/{storeId}/categories")
     public ResponseEntity<List<String>> getAllCategories(@PathVariable String storeId) {
         List<String> categories = productService.getAllCategories(storeId);
-        return ResponseEntity.ok(categories);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 }

@@ -23,24 +23,27 @@ public class StoreController {
     @PostMapping("/signing")
     public ResponseEntity<ResponseStoreDto> signingStore(@RequestBody RegisterStoreDto registerStoreDto) {
         ResponseStoreDto store = storeService.createStore(registerStoreDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(store);
+        return new ResponseEntity<>(store, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StoreProductsDto> findById(@PathVariable String id, @RequestParam(defaultValue = "0") @Min(0) Integer page, @RequestParam(defaultValue = "50") @Max(50) Integer size) {
+    public ResponseEntity<StoreProductsDto> findById(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "0") @Min(0) Integer page,
+            @RequestParam(defaultValue = "50") @Max(50) Integer size) {
         StoreProductsDto store = storeService.getByID(id, page, size);
         if (store == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(store);
+        return new ResponseEntity<>(store, HttpStatus.OK);
     }
 
     @GetMapping("/by-slug/{slug}")
     public ResponseEntity<StoreProductsDto> findBySlug(@PathVariable String slug, @RequestParam(defaultValue = "0") @Min(0) Integer page, @RequestParam(defaultValue = "50") @Max(50) Integer size) {
         StoreProductsDto store = storeService.getBySlug(slug, page, size);
         if (store == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(store);
+        return new ResponseEntity<>(store, HttpStatus.OK);
     }
 }

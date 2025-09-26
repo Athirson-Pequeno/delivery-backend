@@ -4,6 +4,7 @@ import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
 import com.tizo.delivery.service.PaymentService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +25,12 @@ public class PaymentController {
 
     @PostMapping("/pix/{storeId}/{orderId}")
     public ResponseEntity<?> createPixPayment(@PathVariable String storeId, @PathVariable String orderId, @RequestBody List<OrderItemRequestDto> body) throws MPException, MPApiException {
-        return ResponseEntity.ok(paymentService.createPixPayment(storeId, body));
+        return new ResponseEntity<>(paymentService.createPixPayment(storeId, body), HttpStatus.OK);
     }
 
     @GetMapping("/pix/{preferenceId}")
     public ResponseEntity<?> getPixInfo(@PathVariable String preferenceId) {
-        return paymentService.getPixInfo(preferenceId);
+        return new ResponseEntity<>(paymentService.getPixInfo(preferenceId), HttpStatus.OK);
     }
 
     @GetMapping(value = "/pix/status/{paymentId}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -38,8 +39,8 @@ public class PaymentController {
     }
 
     @PostMapping(value = "/pix/webhook")
-    public ResponseEntity<Void> handleWebhook(@RequestBody Map<String, Object> payload) throws MPException, MPApiException {
+    public ResponseEntity<?> handleWebhook(@RequestBody Map<String, Object> payload) throws MPException, MPApiException {
         paymentService.handleWebhook(payload);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

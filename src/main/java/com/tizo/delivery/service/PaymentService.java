@@ -45,7 +45,7 @@ public class PaymentService {
         this.productService = productService;
     }
 
-    public ResponseEntity<?> getPixInfo(String preferenceId) {
+    public Map getPixInfo(String preferenceId) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
@@ -58,7 +58,7 @@ public class PaymentService {
                 entity,
                 Map.class
         );
-        return ok(response.getBody());
+        return response.getBody();
     }
 
     public ResponseEntity<Payment> createPixPayment(String storeId, List<OrderItemRequestDto> orderItems) throws MPException, MPApiException {

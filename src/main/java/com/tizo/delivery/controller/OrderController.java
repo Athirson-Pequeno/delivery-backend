@@ -1,17 +1,15 @@
 package com.tizo.delivery.controller;
 
-import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
+import com.tizo.delivery.model.dto.PageResponseDto;
 import com.tizo.delivery.model.dto.order.OrderRequestDto;
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
-import com.tizo.delivery.model.dto.PageResponseDto;
 import com.tizo.delivery.service.OrderService;
 import com.tizo.delivery.util.OrderModelAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -29,7 +27,7 @@ public class OrderController {
                                                         @PathVariable String storeID,
                                                         @PathVariable String orderID) {
         OrderResponseDto order = orderService.createOrder(storeID, orderID, orderRequestDto);
-        return ResponseEntity.status(201).body(order);
+        return new ResponseEntity<>(order, HttpStatus.CREATED);
     }
 
     @GetMapping("/{storeID}")
@@ -40,7 +38,7 @@ public class OrderController {
 
         PageResponseDto<OrderResponseDto> orders = orderService.getOrdersByStoreId(storeID, page, size);
         PagedModel<EntityModel<OrderResponseDto>> model = assembler.toPagedModel(orders, storeID, page, size);
-        return ResponseEntity.ok(model);
+        return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
     @GetMapping("/{storeID}/{orderID}")
@@ -50,11 +48,10 @@ public class OrderController {
 
         OrderResponseDto orderDto = orderService.getOrderById(storeID, orderID);
         if (orderDto == null) {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         EntityModel<OrderResponseDto> model = assembler.toModel(orderDto, storeID);
-
-        return ResponseEntity.ok(model);
+        return new ResponseEntity<>(model, HttpStatus.OK);
     }
 }
