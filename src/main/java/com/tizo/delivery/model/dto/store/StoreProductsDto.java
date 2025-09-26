@@ -7,6 +7,7 @@ import com.tizo.delivery.model.dto.product.ProductDto;
 import org.springframework.data.domain.Page;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public record StoreProductsDto(String id, String storeSlug, String name, Address address, String phoneNumber,
                                Set<String> productCategories,
@@ -18,7 +19,7 @@ public record StoreProductsDto(String id, String storeSlug, String name, Address
                 store.getName(),
                 store.getAddress(),
                 store.getPhoneNumber(),
-                store.getCategories(),
+                products.stream().map(ProductDto::category).collect(Collectors.toSet()),
                 new PageResponseDto<>(products.getContent(), products)
         );
     }
