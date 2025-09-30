@@ -37,16 +37,8 @@ public class ProductService {
         Product product = new Product();
         product.setName(productDto.name());
         product.setDescription(productDto.description());
-        product.setPrice(productDto.price());
         product.setCategory(productDto.category());
         product.setProductSize(productDto.productSizes());
-
-        if (product.getProductSize() == null) {
-            List<ProductSize> defaultSize = new ArrayList<>();
-            defaultSize.add(new ProductSize(productDto.price()));
-            defaultSize.forEach(System.out::println);
-            product.setProductSize(defaultSize);
-        }
 
         product.getProductSize().forEach(size -> size.setProduct(product));
 
@@ -71,7 +63,7 @@ public class ProductService {
             List<ProductExtras> extras = groupDto.extras().stream().map(extraDto -> {
                 ProductExtras extra = new ProductExtras();
                 extra.setName(extraDto.name());
-                extra.setValue(extraDto.value() != null ? BigDecimal.valueOf(extraDto.value()) : null);
+                extra.setValue(extraDto.value() != null ? extraDto.value() : null);
                 extra.setLimit(extraDto.limit());
                 extra.setActive(extraDto.active() != null ? extraDto.active() : true);
                 extra.setProduct(product);
@@ -118,7 +110,6 @@ public class ProductService {
 
         product.setName(productDto.name());
         product.setDescription(productDto.description());
-        product.setPrice(productDto.price());
         product.setCategory(productDto.category());
 
         if (productImage != null && !productImage.isEmpty()) {

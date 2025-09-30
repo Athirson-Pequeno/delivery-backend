@@ -2,10 +2,12 @@ package com.tizo.delivery.model.dto.product;
 
 import com.tizo.delivery.model.ProductExtras;
 
+import java.math.BigDecimal;
+
 public record ProductExtrasDto(
         Long id,
         String name,
-        Double value,
+        BigDecimal value,
         Long limit,
         Boolean active
 ) {
@@ -13,7 +15,7 @@ public record ProductExtrasDto(
         this(
                 extra.getId(),
                 extra.getName(),
-                extra.getValue() != null ? extra.getValue().doubleValue() : 0,
+                extra.getValue(),
                 extra.getLimit(),
                 extra.getActive()
         );
