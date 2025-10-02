@@ -1,6 +1,8 @@
-package com.tizo.delivery.model;
+package com.tizo.delivery.model.store;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tizo.delivery.model.product.Product;
+import com.tizo.delivery.model.order.Order;
 import jakarta.persistence.*;
 
 import java.util.HashSet;

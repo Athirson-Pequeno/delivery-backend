@@ -1,5 +1,6 @@
-package com.tizo.delivery.model;
+package com.tizo.delivery.model.order;
 
+import com.tizo.delivery.model.store.Store;
 import com.tizo.delivery.model.enums.OrderStatus;
 import jakarta.persistence.*;
 

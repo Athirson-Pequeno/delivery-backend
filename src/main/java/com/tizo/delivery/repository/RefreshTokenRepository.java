@@ -1,7 +1,7 @@
 package com.tizo.delivery.repository;
 
-import com.tizo.delivery.model.RefreshToken;
-import com.tizo.delivery.model.StoreUser;
+import com.tizo.delivery.model.auth.RefreshToken;
+import com.tizo.delivery.model.store.StoreUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

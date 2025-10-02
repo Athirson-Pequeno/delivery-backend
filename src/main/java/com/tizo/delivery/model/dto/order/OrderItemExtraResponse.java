@@ -1,6 +1,6 @@
 package com.tizo.delivery.model.dto.order;
 
-import com.tizo.delivery.model.OrderItemExtra;
+import com.tizo.delivery.model.order.OrderItemExtra;
 
 import java.math.BigDecimal;
 

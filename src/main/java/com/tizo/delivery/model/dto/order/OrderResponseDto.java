@@ -1,8 +1,8 @@
 package com.tizo.delivery.model.dto.order;
 
-import com.tizo.delivery.model.CustomerInfo;
-import com.tizo.delivery.model.Order;
-import com.tizo.delivery.model.Payment;
+import com.tizo.delivery.model.order.CustomerInfo;
+import com.tizo.delivery.model.order.Order;
+import com.tizo.delivery.model.order.Payment;
 import com.tizo.delivery.model.enums.OrderStatus;
 
 import java.time.LocalDateTime;

@@ -1,5 +1,6 @@
-package com.tizo.delivery.model;
+package com.tizo.delivery.model.auth;
 
+import com.tizo.delivery.model.store.StoreUser;
 import jakarta.persistence.*;
 
 import java.time.Instant;

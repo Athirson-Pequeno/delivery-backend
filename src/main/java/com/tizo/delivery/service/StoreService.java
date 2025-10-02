@@ -1,7 +1,7 @@
 package com.tizo.delivery.service;
 
-import com.tizo.delivery.model.Store;
-import com.tizo.delivery.model.StoreUser;
+import com.tizo.delivery.model.store.Store;
+import com.tizo.delivery.model.store.StoreUser;
 import com.tizo.delivery.model.dto.product.ProductDto;
 import com.tizo.delivery.model.dto.store.RegisterStoreDto;
 import com.tizo.delivery.model.dto.store.ResponseStoreDto;

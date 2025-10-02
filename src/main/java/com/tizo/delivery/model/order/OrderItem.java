@@ -1,4 +1,4 @@
-package com.tizo.delivery.model;
+package com.tizo.delivery.model.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -30,7 +30,7 @@ public class OrderItem {
     private Integer quantity;
 
     @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrderItemExtra> extras = new HashSet<>();
+    private Set<OrderItemExtraGroup> extrasGroup = new HashSet<>();
 
     public OrderItem() {
     }
@@ -83,7 +83,8 @@ public class OrderItem {
 
     @Transient
     public BigDecimal getExtrasTotal() {
-        return extras.stream()
+
+        return extrasGroup.stream().flatMap(extra -> extra.getExtras().stream())
                 .map(OrderItemExtra::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .multiply(BigDecimal.valueOf(quantity));
@@ -102,14 +103,13 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    public Set<OrderItemExtra> getExtras() {
-        return extras;
+    public Set<OrderItemExtraGroup> getExtrasGroup() {
+        return extrasGroup;
     }
 
-    public void setExtras(Set<OrderItemExtra> extras) {
-        this.extras = extras;
+    public void setExtrasGroup(Set<OrderItemExtraGroup> extrasGroup) {
+        this.extrasGroup = extrasGroup;
     }
-
     public String getSize() {
         return size;
     }
@@ -125,6 +125,8 @@ public class OrderItem {
     public void setSizeDescription(String sizeDescription) {
         this.sizeDescription = sizeDescription;
     }
+
+
 
     @Override
     public boolean equals(Object object) {

@@ -1,10 +1,10 @@
 package com.tizo.delivery.service;
 
 import com.tizo.delivery.exception.exceptions.UnauthorizedException;
-import com.tizo.delivery.model.RefreshToken;
-import com.tizo.delivery.model.Store;
-import com.tizo.delivery.model.StoreUser;
-import com.tizo.delivery.model.UserDetailsImpl;
+import com.tizo.delivery.model.auth.RefreshToken;
+import com.tizo.delivery.model.store.Store;
+import com.tizo.delivery.model.store.StoreUser;
+import com.tizo.delivery.model.auth.UserDetailsImpl;
 import com.tizo.delivery.model.dto.auth.AuthCredentialsDto;
 import com.tizo.delivery.model.dto.auth.AuthResponseDto;
 import com.tizo.delivery.model.dto.auth.RefreshRequestDto;

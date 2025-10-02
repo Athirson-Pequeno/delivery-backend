@@ -1,4 +1,4 @@
-package com.tizo.delivery.model;
+package com.tizo.delivery.model.store;
 
 import com.tizo.delivery.model.enums.StoreUserRole;
 import jakarta.persistence.*;

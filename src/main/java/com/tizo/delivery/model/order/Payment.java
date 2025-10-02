@@ -1,4 +1,4 @@
-package com.tizo.delivery.model;
+package com.tizo.delivery.model.order;
 
 import com.tizo.delivery.model.enums.PaymentMethod;
 import com.tizo.delivery.model.enums.PaymentStatus;

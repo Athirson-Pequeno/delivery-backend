@@ -1,7 +1,7 @@
 package com.tizo.delivery.service;
 
-import com.tizo.delivery.model.StoreUser;
-import com.tizo.delivery.model.UserDetailsImpl;
+import com.tizo.delivery.model.store.StoreUser;
+import com.tizo.delivery.model.auth.UserDetailsImpl;
 import com.tizo.delivery.repository.StoreUserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

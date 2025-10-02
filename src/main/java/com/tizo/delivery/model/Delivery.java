@@ -1,6 +1,7 @@
 package com.tizo.delivery.model;
 
 import com.tizo.delivery.model.enums.DeliveryType;
+import com.tizo.delivery.model.store.Address;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EnumType;

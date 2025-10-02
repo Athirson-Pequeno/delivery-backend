@@ -1,4 +1,4 @@
-package com.tizo.delivery.model;
+package com.tizo.delivery.model.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -23,19 +23,18 @@ public class OrderItemExtra {
     private Long quantity;
 
     @ManyToOne
-    @JoinColumn(name = "order_item_id")
     @JsonIgnore
-    private OrderItem orderItem;
+    @JoinColumn(name = "order_item_extra_group_id")
+    private OrderItemExtraGroup orderItemExtraGroup;
 
     public OrderItemExtra() {
     }
 
-    public OrderItemExtra(String name, BigDecimal value, Long limit, Long quantity, OrderItem orderItem) {
+    public OrderItemExtra(String name, BigDecimal value, Long limit, Long quantity ) {
         this.name = name;
         this.price = value;
         this.limit = limit;
         this.quantity = quantity;
-        this.orderItem = orderItem;
     }
 
     public String getName() {
@@ -78,11 +77,11 @@ public class OrderItemExtra {
         this.quantity = quantity;
     }
 
-    public OrderItem getOrderItem() {
-        return orderItem;
+    public OrderItemExtraGroup getOrderItemExtraGroup() {
+        return orderItemExtraGroup;
     }
 
-    public void setOrderItem(OrderItem orderItem) {
-        this.orderItem = orderItem;
+    public void setOrderItemExtraGroup(OrderItemExtraGroup orderItemExtraGroup) {
+        this.orderItemExtraGroup = orderItemExtraGroup;
     }
 }

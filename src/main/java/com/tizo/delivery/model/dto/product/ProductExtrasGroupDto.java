@@ -1,7 +1,7 @@
 package com.tizo.delivery.model.dto.product;
 
 
-import com.tizo.delivery.model.ProductExtrasGroup;
+import com.tizo.delivery.model.product.ProductExtrasGroup;
 
 import java.util.List;
 

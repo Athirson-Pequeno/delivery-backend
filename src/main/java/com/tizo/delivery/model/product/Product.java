@@ -1,6 +1,7 @@
-package com.tizo.delivery.model;
+package com.tizo.delivery.model.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tizo.delivery.model.store.Store;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

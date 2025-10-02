@@ -1,6 +1,6 @@
 package com.tizo.delivery.repository;
 
-import com.tizo.delivery.model.Order;
+import com.tizo.delivery.model.order.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

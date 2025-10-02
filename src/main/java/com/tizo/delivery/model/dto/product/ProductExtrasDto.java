@@ -1,6 +1,6 @@
 package com.tizo.delivery.model.dto.product;
 
-import com.tizo.delivery.model.ProductExtras;
+import com.tizo.delivery.model.product.ProductExtras;
 
 import java.math.BigDecimal;
 

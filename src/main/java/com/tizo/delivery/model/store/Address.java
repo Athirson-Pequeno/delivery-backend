@@ -1,4 +1,4 @@
-package com.tizo.delivery.model;
+package com.tizo.delivery.model.store;
 
 import jakarta.persistence.Embeddable;
 

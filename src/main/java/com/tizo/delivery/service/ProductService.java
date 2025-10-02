@@ -1,7 +1,10 @@
 package com.tizo.delivery.service;
 
-import com.tizo.delivery.model.*;
 import com.tizo.delivery.model.dto.product.ProductDto;
+import com.tizo.delivery.model.product.Product;
+import com.tizo.delivery.model.product.ProductExtras;
+import com.tizo.delivery.model.product.ProductExtrasGroup;
+import com.tizo.delivery.model.store.Store;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
 import com.tizo.delivery.util.SlugGenerator;
@@ -10,12 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +52,6 @@ public class ProductService {
             product.setImagePath(createFileUrl(productImage, store.getSlug()));
         }
 
-        // Montar grupos + extras
         if (productDto.extrasGroups() != null && !productDto.extrasGroups().isEmpty()) {
         List<ProductExtrasGroup> groups = productDto.extrasGroups().stream().map(groupDto -> {
             ProductExtrasGroup group = new ProductExtrasGroup();
@@ -63,7 +63,7 @@ public class ProductService {
             List<ProductExtras> extras = groupDto.extras().stream().map(extraDto -> {
                 ProductExtras extra = new ProductExtras();
                 extra.setName(extraDto.name());
-                extra.setValue(extraDto.value() != null ? extraDto.value() : null);
+                extra.setValue(extraDto.value());
                 extra.setLimit(extraDto.limit());
                 extra.setActive(extraDto.active() != null ? extraDto.active() : true);
                 extra.setProduct(product);
@@ -81,7 +81,6 @@ public class ProductService {
         Product createdProduct = productRepository.save(product);
         return new ProductDto(createdProduct);
     }
-
 
     public ProductDto getProductById(String storeId, Long productId) {
         Product product = productRepository.findById(productId)

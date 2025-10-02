@@ -1,7 +1,6 @@
 package com.tizo.delivery.model.dto.order;
 
-import com.tizo.delivery.model.OrderItem;
-import com.tizo.delivery.model.dto.order.OrderItemExtraResponse;
+import com.tizo.delivery.model.order.OrderItem;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -18,7 +17,7 @@ public record OrderItemResponse(
         BigDecimal subtotal,
         BigDecimal extrasTotal,
         BigDecimal total,
-        Set<OrderItemExtraResponse> extras
+        Set<OrderItemExtraGroupResponse> extrasGroup
 ) {
     public static OrderItemResponse fromEntity(OrderItem item) {
         return new OrderItemResponse(
@@ -32,8 +31,8 @@ public record OrderItemResponse(
                 item.getSubtotal(),
                 item.getExtrasTotal(),
                 item.getTotal(),
-                item.getExtras().stream()
-                        .map(OrderItemExtraResponse::fromEntity)
+                item.getExtrasGroup().stream()
+                        .map(OrderItemExtraGroupResponse::fromEntity)
                         .collect(Collectors.toSet())
         );
     }

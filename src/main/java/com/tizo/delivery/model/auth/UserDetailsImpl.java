@@ -1,6 +1,7 @@
-package com.tizo.delivery.model;
+package com.tizo.delivery.model.auth;
 
 import com.tizo.delivery.model.enums.StoreUserRole;
+import com.tizo.delivery.model.store.StoreUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
