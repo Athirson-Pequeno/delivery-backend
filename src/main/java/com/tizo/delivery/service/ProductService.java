@@ -1,10 +1,13 @@
 package com.tizo.delivery.service;
 
+import com.tizo.delivery.exception.exceptions.UnauthorizedException;
+import com.tizo.delivery.model.auth.UserDetailsImpl;
 import com.tizo.delivery.model.dto.product.ProductDto;
 import com.tizo.delivery.model.product.Product;
 import com.tizo.delivery.model.product.ProductExtras;
 import com.tizo.delivery.model.product.ProductExtrasGroup;
 import com.tizo.delivery.model.store.Store;
+import com.tizo.delivery.model.store.StoreUser;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
 import com.tizo.delivery.util.SlugGenerator;
@@ -26,15 +29,26 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
     private final SlugGenerator slugGenerator;
+    private final JwtService jwtService;
 
-    public ProductService(ProductRepository productRepository, StoreRepository storeRepository, SlugGenerator slugGenerator) {
+    public ProductService(ProductRepository productRepository, StoreRepository storeRepository, SlugGenerator slugGenerator, JwtService jwtService) {
         this.productRepository = productRepository;
         this.storeRepository = storeRepository;
         this.slugGenerator = slugGenerator;
+        this.jwtService = jwtService;
     }
 
     @Transactional
-    public ProductDto addProductToStore(ProductDto productDto, String storeId, MultipartFile productImage) throws IOException {
+    public ProductDto addProductToStore(ProductDto productDto, String storeId, MultipartFile productImage, String token) throws IOException {
+        String userEmail = jwtService.extractEmail(token);
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
+
+        if(store.getUsers().stream().map(StoreUser::getEmail).anyMatch(email -> email.equals(userEmail))){
+            throw new UnauthorizedException("Unauthorized");
+        }
+
         Product product = new Product();
         product.setName(productDto.name());
         product.setDescription(productDto.description());
@@ -42,9 +56,6 @@ public class ProductService {
         product.setProductSize(productDto.productSizes());
 
         product.getProductSize().forEach(size -> size.setProduct(product));
-
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
 
         product.setStore(store);
 

@@ -3,8 +3,6 @@ package com.tizo.delivery.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,8 +24,6 @@ public class JwtService {
 
     @Value("${jwt.refresh.token.expiration}")
     Long refreshTokenExpiration;
-
-    private final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
 
     private String buildToken(String subject,
@@ -68,10 +64,9 @@ public class JwtService {
         return Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()
-                    .parseSignedClaims(token)
+                    .parseSignedClaims(token.replace("Bearer ", ""))
                     .getPayload()
                     .getSubject();
-
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

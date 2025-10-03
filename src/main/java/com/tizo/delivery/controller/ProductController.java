@@ -24,6 +24,7 @@ public class ProductController {
 
     @PostMapping(value = "/{storeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductDto> addProduct(
+            @RequestHeader("Authorization") String token,
             @RequestPart("product") String productJson,
             @RequestPart(value = "productImage", required = false) MultipartFile productImage,
             @PathVariable String storeId
@@ -31,7 +32,7 @@ public class ProductController {
         ObjectMapper mapper = new ObjectMapper();
         ProductDto productDto = mapper.readValue(productJson, ProductDto.class);
 
-        ProductDto createdProduct = productService.addProductToStore(productDto, storeId, productImage);
+        ProductDto createdProduct = productService.addProductToStore(productDto, storeId, productImage, token);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 
