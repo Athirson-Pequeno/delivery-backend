@@ -1,5 +1,6 @@
 package com.tizo.delivery.service;
 
+import com.tizo.delivery.exception.exceptions.EmailAlreadyExistsException;
 import com.tizo.delivery.model.store.Store;
 import com.tizo.delivery.model.store.StoreUser;
 import com.tizo.delivery.model.dto.product.ProductDto;
@@ -11,6 +12,7 @@ import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
 import com.tizo.delivery.repository.StoreUserRepository;
 import com.tizo.delivery.util.SlugGenerator;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,11 @@ public class StoreService {
     }
 
     public ResponseStoreDto createStore(RegisterStoreDto registerStoreDto) {
+
+        if(storeUserRepository.existsByEmail(registerStoreDto.email())){
+            throw new EmailAlreadyExistsException("O email '" + registerStoreDto.email() + "' já está cadastrado.");
+        }
+
         Store store = new Store();
         store.setName(registerStoreDto.name());
         store.setSlug(slugGenerator.generateStoreSlug(registerStoreDto.name()));
@@ -55,18 +62,19 @@ public class StoreService {
         return new ResponseStoreDto(store);
     }
 
-    public StoreProductsDto getByID(String id, Integer page, Integer size) {
-        Store store = storeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Store not found with id: " + id));
+    public StoreProductsDto getByID(String storeId, Integer page, Integer size) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new EntityNotFoundException("Loja não encontrada, storeId: " + storeId));
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "category"));
-        Page<ProductDto> productPage = productRepository.findByStoreId(id, pageable).map(ProductDto::new);
+        Page<ProductDto> productPage = productRepository.findByStoreId(storeId, pageable).map(ProductDto::new);
 
         return new StoreProductsDto(store, productPage);
     }
 
     public StoreProductsDto getBySlug(String slug, Integer page, Integer size) {
-        Store store = storeRepository.getStoreBySlug(slug).orElseThrow(() -> new RuntimeException("Store not found with slug: " + slug));
+        Store store = storeRepository.getStoreBySlug(slug)
+                .orElseThrow(() -> new EntityNotFoundException("Loja não encontrada, storeSlug: " + slug));
 
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductDto> productPage = productRepository.findByStoreId(store.getId(), pageable).map(ProductDto::new);

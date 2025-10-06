@@ -1,5 +1,6 @@
 package com.tizo.delivery.service;
 
+import com.tizo.delivery.exception.exceptions.EmailAlreadyExistsException;
 import com.tizo.delivery.exception.exceptions.UnauthorizedException;
 import com.tizo.delivery.model.auth.RefreshToken;
 import com.tizo.delivery.model.store.Store;
@@ -64,20 +65,20 @@ public class AuthService {
     public AuthResponseDto registerManager(AuthCredentialsDto registerRequest, String storeId, StoreUserRole storeUserRole) {
         // Valida se email já está cadastrado
         if (storeUserRepository.existsByEmail(registerRequest.email())) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new EmailAlreadyExistsException("O email '" + registerRequest.email() + "' já está cadastrado.");
         }
 
         // Cria novo usuário
         StoreUser storeUser = new StoreUser();
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new EntityNotFoundException("Store with id: " + storeId + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Loja não encontrada, id: " + storeId));
 
         // Configura dados do usuário
         storeUser.setEmail(registerRequest.email());
-        storeUser.setPassword(passwordEncoder.encode(registerRequest.password())); // Criptografa senha
-        storeUser.setRole(storeUserRole); // Role: MANAGER ou EMPLOYEE
-        storeUser.setStore(store);         // Associação à loja
-        storeUserRepository.save(storeUser); // Salva no banco
+        storeUser.setPassword(passwordEncoder.encode(registerRequest.password()));
+        storeUser.setRole(storeUserRole);
+        storeUser.setStore(store);
+        storeUserRepository.save(storeUser);
 
         // Cria tokens JWT
         UserDetailsImpl userDetails = new UserDetailsImpl(storeUser);

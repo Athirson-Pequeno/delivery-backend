@@ -1,5 +1,6 @@
 package com.tizo.delivery.service;
 
+import com.tizo.delivery.exception.exceptions.ResourceOwnershipException;
 import com.tizo.delivery.model.order.Order;
 import com.tizo.delivery.model.order.OrderItem;
 import com.tizo.delivery.model.order.Payment;
@@ -13,6 +14,7 @@ import com.tizo.delivery.repository.OrderRepository;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
 import com.tizo.delivery.util.OrderItemFactory;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -92,7 +94,7 @@ public class OrderService {
 
     public PageResponseDto<OrderResponseDto> getOrdersByStoreId(String storeId, Integer page, Integer size) {
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
+                .orElseThrow(() -> new EntityNotFoundException("Loja não encontrada, id: " + storeId));
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Order> orderPage = orderRepository.findAllByStoreId(store.getId(), pageable);
@@ -104,18 +106,18 @@ public class OrderService {
         return new PageResponseDto<>(dtos, orderPage);
     }
 
-    public OrderResponseDto getOrderById(String storeID, String orderID) {
-        Store store = storeRepository.findById(storeID)
-                .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeID));
+    public OrderResponseDto getOrderById(String storeId, String orderID) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new EntityNotFoundException("Loja não encontrada, id: " + storeId));
 
         Order order = orderRepository.findByIdAndStore_Id(orderID, store.getId());
 
         if (order == null) {
-            throw new RuntimeException("Order not found with id: " + orderID + " for store: " + storeID);
+            throw new EntityNotFoundException("Pedido não encontrado, pedido ID: " + orderID + " na loja: " + storeId);
         }
 
         if (!order.getStore().getId().equals(store.getId())) {
-            throw new RuntimeException("Order does not belong to the store with id: " + storeID);
+            throw new ResourceOwnershipException("Pedido não pertence a loja, store id; " + storeId);
         }
 
         return new OrderResponseDto(order);

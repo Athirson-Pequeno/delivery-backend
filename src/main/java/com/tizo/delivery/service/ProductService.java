@@ -1,7 +1,6 @@
 package com.tizo.delivery.service;
 
-import com.tizo.delivery.exception.exceptions.UnauthorizedException;
-import com.tizo.delivery.model.auth.UserDetailsImpl;
+import com.hazelcast.internal.ascii.rest.HttpForbiddenException;
 import com.tizo.delivery.model.dto.product.ProductDto;
 import com.tizo.delivery.model.product.Product;
 import com.tizo.delivery.model.product.ProductExtras;
@@ -10,7 +9,9 @@ import com.tizo.delivery.model.store.Store;
 import com.tizo.delivery.model.store.StoreUser;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
+import com.tizo.delivery.repository.StoreUserRepository;
 import com.tizo.delivery.util.SlugGenerator;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +32,10 @@ public class ProductService {
     private final SlugGenerator slugGenerator;
     private final JwtService jwtService;
 
-    public ProductService(ProductRepository productRepository, StoreRepository storeRepository, SlugGenerator slugGenerator, JwtService jwtService) {
+    public ProductService(ProductRepository productRepository,
+                          StoreRepository storeRepository,
+                          SlugGenerator slugGenerator,
+                          JwtService jwtService) {
         this.productRepository = productRepository;
         this.storeRepository = storeRepository;
         this.slugGenerator = slugGenerator;
@@ -43,10 +47,10 @@ public class ProductService {
         String userEmail = jwtService.extractEmail(token);
 
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
+                .orElseThrow(() -> new EntityNotFoundException("Loja não encontrada, id: " + storeId));
 
-        if(store.getUsers().stream().map(StoreUser::getEmail).anyMatch(email -> email.equals(userEmail))){
-            throw new UnauthorizedException("Unauthorized");
+        if(store.getUsers().stream().map(StoreUser::getEmail).noneMatch(email -> email.equals(userEmail))){
+            throw new HttpForbiddenException();
         }
 
         Product product = new Product();
@@ -95,9 +99,10 @@ public class ProductService {
 
     public ProductDto getProductById(String storeId, Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado, id: " + productId));
+
         if (!product.getStore().getId().equals(storeId)) {
-            throw new RuntimeException("Product does not belong to this store");
+            throw new HttpForbiddenException();
         }
         return new ProductDto(product);
     }
@@ -111,11 +116,12 @@ public class ProductService {
 
     }
 
-    public ProductDto updateProduct(ProductDto productDto, Long productID, String storeId, MultipartFile productImage) throws IOException {
-        Product product = productRepository.findById(productID).orElseThrow(() -> new RuntimeException("Product not found with id: " + productID));
+    public ProductDto updateProduct(ProductDto productDto, Long productId, String storeId, MultipartFile productImage) throws IOException {
+        Product product = productRepository.findById(productId).orElseThrow(() ->
+                new EntityNotFoundException("Produto não encontrado, id: " + productId));
 
         if (!product.getStore().getId().equals(storeId)) {
-            throw new RuntimeException("Product does not belong to the specified store.");
+            throw new HttpForbiddenException();
         }
 
         product.setName(productDto.name());
@@ -133,9 +139,10 @@ public class ProductService {
 
     public boolean deleteProduct(Long productId, String storeId) throws IOException {
 
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+        Product product = productRepository.findById(productId).orElseThrow(() ->
+                new EntityNotFoundException("Produto não encontrado, id: " + productId));
         if (!product.getStore().getId().equals(storeId)) {
-            throw new RuntimeException("Product does not belong to the specified store.");
+            throw new HttpForbiddenException();
         }
 
         if (productRepository.existsById(productId)) {
@@ -167,6 +174,5 @@ public class ProductService {
                 .map(ProductDto::category)
                 .distinct()
                 .toList();
-
     }
 }
