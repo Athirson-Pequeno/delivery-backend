@@ -1,15 +1,15 @@
 package com.tizo.delivery.service;
 
 import com.tizo.delivery.exception.exceptions.ResourceOwnershipException;
-import com.tizo.delivery.model.order.Order;
-import com.tizo.delivery.model.order.OrderItem;
-import com.tizo.delivery.model.order.Payment;
-import com.tizo.delivery.model.store.Store;
 import com.tizo.delivery.model.dto.PageResponseDto;
 import com.tizo.delivery.model.dto.order.OrderRequestDto;
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
 import com.tizo.delivery.model.enums.OrderStatus;
 import com.tizo.delivery.model.enums.PaymentStatus;
+import com.tizo.delivery.model.order.Order;
+import com.tizo.delivery.model.order.OrderItem;
+import com.tizo.delivery.model.order.Payment;
+import com.tizo.delivery.model.store.Store;
 import com.tizo.delivery.repository.OrderRepository;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
@@ -32,30 +32,35 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final StoreRepository storeRepository;
     private final ProductRepository productRepository;
+    private final OrderStreamService orderStreamService;
 
-    public OrderService(OrderRepository orderRepository, StoreRepository storeRepository, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository,
+                        StoreRepository storeRepository,
+                        ProductRepository productRepository,
+                        OrderStreamService orderStreamService) {
         this.orderRepository = orderRepository;
         this.storeRepository = storeRepository;
         this.productRepository = productRepository;
+        this.orderStreamService = orderStreamService;
     }
 
     @Transactional
     public OrderResponseDto createOrder(String storeId, String orderId, OrderRequestDto orderRequestDto) {
 
-        // 1️⃣ Recupera a loja pelo ID ou lança exceção se não existir -- mudar para o exception handler
+        //Recupera a loja pelo ID ou lança exceção se não existir -- mudar para o exception handler
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
 
-        // 2️⃣ Remove pedido existente com mesmo ID, se houver, garantindo atualização
+        //Remove pedido existente com mesmo ID, se houver, garantindo atualização
         if (orderRepository.existsOrderById(orderId)) {
             orderRepository.deleteOrderById(orderId);
             orderRepository.flush();
         }
 
-        // 3️⃣ Cria novo pedido
+        //Cria novo pedido
         Order order = new Order();
 
-        // 4️⃣ Popula dados básicos do pedido
+        //Popula dados básicos do pedido
         order.setId(orderId);
         order.setStore(store);
         order.setOrderStatus(OrderStatus.PENDING);
@@ -64,17 +69,17 @@ public class OrderService {
         order.setCustomerInfos(orderRequestDto.customerInfo());
         order.setObservation(orderRequestDto.observation());
 
-        // 5️⃣ Cria itens do pedido a partir do DTO
+        //Cria itens do pedido a partir do DTO
         List<OrderItem> orderItems = orderRequestDto.items().stream()
                 .map(dto -> OrderItemFactory.create(productRepository.findById(dto.productId()).orElseThrow(), dto, order))
                 .collect(Collectors.toList());
 
         order.setItems(orderItems);
 
-        // 6️⃣ Inicializa pagamento
+        // Inicializa pagamento
         order.setPayment(new Payment());
 
-        // 7️⃣ Calcula valores do pagamento
+        // Calcula valores do pagamento
         BigDecimal totalValue = orderItems.stream()
                 .map(OrderItem::getTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -88,8 +93,14 @@ public class OrderService {
                 .add(order.getPayment().getFee()));
         order.getPayment().setChange(orderRequestDto.payment().getChange());
 
-        // 8️⃣ Salva o pedido e retorna o DTO de resposta
-        return new OrderResponseDto(orderRepository.save(order));
+        // Salva o pedido e retorna o DTO de resposta
+        Order createdOrder = orderRepository.save(order);
+        OrderResponseDto orderResponseDto = new OrderResponseDto(createdOrder);
+
+        // Emite Pedido criado
+        orderStreamService.emitOrderCreated(storeId, orderResponseDto);
+
+        return orderResponseDto;
     }
 
     public PageResponseDto<OrderResponseDto> getOrdersByStoreId(String storeId, Integer page, Integer size) {
