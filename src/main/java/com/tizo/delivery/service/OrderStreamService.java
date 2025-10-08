@@ -1,6 +1,7 @@
 package com.tizo.delivery.service;
 
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
+import com.tizo.delivery.repository.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OrderStreamService {
 
     private static final Logger log = LoggerFactory.getLogger(OrderStreamService.class);
+
+    private final OrderRepository orderRepository;
+
+    public OrderStreamService(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+    }
 
     private final Map<String, Map<String, SseEmitter>> emittersByStore = new ConcurrentHashMap<>();
 

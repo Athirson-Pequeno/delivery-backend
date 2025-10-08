@@ -1,10 +1,15 @@
 package com.tizo.delivery.repository;
 
 import com.tizo.delivery.model.order.Order;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.net.http.HttpHeaders;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Integer> {
@@ -16,4 +21,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     boolean existsOrderById(String id);
 
     void deleteOrderById(String id);
+
+    Page<Order> findAllByStoreIdAndCreatedAtBetween(String storeId, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore, Pageable sort);
 }

@@ -58,7 +58,7 @@ public class ApiConfig implements WebMvcConfigurer {
                                 .requestMatchers("/api/v1/auth/register/manager/**").hasAuthority("ROLE_OWNER")
                                 .requestMatchers("/api/v1/auth/register/employee/**", "/api/v1/product/**").hasAnyAuthority("ROLE_OWNER", "ROLE_MANAGER")
                                 .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh-token", "/api/v1/store/signing").permitAll()
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Permite requisições OPTIONS
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .anyRequest().permitAll())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

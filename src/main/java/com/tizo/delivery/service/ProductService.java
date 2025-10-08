@@ -9,7 +9,6 @@ import com.tizo.delivery.model.store.Store;
 import com.tizo.delivery.model.store.StoreUser;
 import com.tizo.delivery.repository.ProductRepository;
 import com.tizo.delivery.repository.StoreRepository;
-import com.tizo.delivery.repository.StoreUserRepository;
 import com.tizo.delivery.util.SlugGenerator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -49,7 +48,7 @@ public class ProductService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("Loja não encontrada, id: " + storeId));
 
-        if(store.getUsers().stream().map(StoreUser::getEmail).noneMatch(email -> email.equals(userEmail))){
+        if (store.getUsers().stream().map(StoreUser::getEmail).noneMatch(email -> email.equals(userEmail))) {
             throw new HttpForbiddenException();
         }
 
@@ -68,27 +67,27 @@ public class ProductService {
         }
 
         if (productDto.extrasGroups() != null && !productDto.extrasGroups().isEmpty()) {
-        List<ProductExtrasGroup> groups = productDto.extrasGroups().stream().map(groupDto -> {
-            ProductExtrasGroup group = new ProductExtrasGroup();
-            group.setName(groupDto.name());
-            group.setMinSelections(groupDto.minSelections());
-            group.setMaxSelections(groupDto.maxSelections());
-            group.setProduct(product);
+            List<ProductExtrasGroup> groups = productDto.extrasGroups().stream().map(groupDto -> {
+                ProductExtrasGroup group = new ProductExtrasGroup();
+                group.setName(groupDto.name());
+                group.setMinSelections(groupDto.minSelections());
+                group.setMaxSelections(groupDto.maxSelections());
+                group.setProduct(product);
 
-            List<ProductExtras> extras = groupDto.extras().stream().map(extraDto -> {
-                ProductExtras extra = new ProductExtras();
-                extra.setName(extraDto.name());
-                extra.setValue(extraDto.value());
-                extra.setLimit(extraDto.limit());
-                extra.setActive(extraDto.active() != null ? extraDto.active() : true);
-                extra.setProduct(product);
-                extra.setExtraGroup(group);
-                return extra;
+                List<ProductExtras> extras = groupDto.extras().stream().map(extraDto -> {
+                    ProductExtras extra = new ProductExtras();
+                    extra.setName(extraDto.name());
+                    extra.setValue(extraDto.value());
+                    extra.setLimit(extraDto.limit());
+                    extra.setActive(extraDto.active() != null ? extraDto.active() : true);
+                    extra.setProduct(product);
+                    extra.setExtraGroup(group);
+                    return extra;
+                }).toList();
+
+                group.setExtras(extras);
+                return group;
             }).toList();
-
-            group.setExtras(extras);
-            return group;
-        }).toList();
 
             product.setExtrasGroups(groups);
         }
@@ -147,8 +146,13 @@ public class ProductService {
 
         if (productRepository.existsById(productId)) {
             if (product.getImagePath() != null) {
-                Path destination = Paths.get("uploads/" + product.getImagePath());
-                Files.delete(destination);
+                try {
+                    Path destination = Paths.get("uploads/" + product.getImagePath());
+                    Files.delete(destination);
+                } catch (IOException e) {
+                    productRepository.deleteById(productId);
+                    return true;
+                }
             }
             productRepository.deleteById(productId);
             return true;

@@ -2,6 +2,7 @@ package com.tizo.delivery.model.dto.order;
 
 import com.tizo.delivery.model.order.CustomerInfo;
 import com.tizo.delivery.model.order.Order;
+import com.tizo.delivery.model.order.OrderItem;
 import com.tizo.delivery.model.order.Payment;
 import com.tizo.delivery.model.enums.OrderStatus;
 
@@ -23,6 +24,20 @@ public record OrderResponseDto(
 
     public OrderResponseDto(Order order) {
         this(
+                order.getId(),
+                order.getStore().getName(),
+                order.getOrderStatus(),
+                order.getCreatedAt(),
+                order.getUpdatedAt(),
+                order.getObservation(),
+                order.getPayment(),
+                order.getCustomerInfos(),
+                order.getItems().stream().map(OrderItemResponse::fromEntity).collect(Collectors.toList())
+        );
+    }
+
+    public static OrderResponseDto fromEntity(Order order) {
+        return new OrderResponseDto(
                 order.getId(),
                 order.getStore().getName(),
                 order.getOrderStatus(),

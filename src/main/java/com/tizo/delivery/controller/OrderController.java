@@ -5,11 +5,16 @@ import com.tizo.delivery.model.dto.order.OrderRequestDto;
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
 import com.tizo.delivery.service.OrderService;
 import com.tizo.delivery.util.OrderModelAssembler;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -41,17 +46,29 @@ public class OrderController {
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
-    @GetMapping("/{storeID}/{orderID}")
+    @GetMapping("/{storeId}/{orderId}")
     public ResponseEntity<EntityModel<OrderResponseDto>> getOrderById(
-            @PathVariable String storeID,
-            @PathVariable String orderID) {
+            @PathVariable String storeId,
+            @PathVariable String orderId) {
 
-        OrderResponseDto orderDto = orderService.getOrderById(storeID, orderID);
+        OrderResponseDto orderDto = orderService.getOrderById(storeId, orderId);
         if (orderDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        EntityModel<OrderResponseDto> model = assembler.toModel(orderDto, storeID);
+        EntityModel<OrderResponseDto> model = assembler.toModel(orderDto, storeId);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
+
+    @GetMapping("/days/{storeId}")
+    public ResponseEntity<Page<OrderResponseDto>> getOrdersByDate(
+            @PathVariable String storeId,
+            Pageable pageable
+    ) {
+        LocalDate  date = LocalDate.now();
+
+        Page<OrderResponseDto> page = orderService.findByStoreAndDate(storeId, date, pageable);
+        return ResponseEntity.ok(page);
+    }
+
 }

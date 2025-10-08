@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -132,5 +133,16 @@ public class OrderService {
         }
 
         return new OrderResponseDto(order);
+    }
+
+    public Page<OrderResponseDto> findByStoreAndDate(String storeId, LocalDate date, Pageable pageable) {
+        LocalDateTime start = date.minusDays(100).atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+
+        System.out.println(start);
+        System.out.println(end);
+
+        return orderRepository.findAllByStoreIdAndCreatedAtBetween(storeId, start, end, pageable)
+                .map(OrderResponseDto::fromEntity);
     }
 }
