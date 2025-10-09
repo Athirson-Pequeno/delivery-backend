@@ -19,11 +19,14 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -109,13 +112,10 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Loja não encontrada, id: " + storeId));
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Order> orderPage = orderRepository.findAllByStoreId(store.getId(), pageable);
+        Page<OrderResponseDto> dtoPage = orderRepository.findAllByStoreId(store.getId(), pageable)
+                .map(OrderResponseDto::new);
 
-        List<OrderResponseDto> dtos = orderPage.stream()
-                .map(OrderResponseDto::new)
-                .toList();
-
-        return new PageResponseDto<>(dtos, orderPage);
+        return new PageResponseDto<>(dtoPage);
     }
 
     public OrderResponseDto getOrderById(String storeId, String orderID) {
@@ -135,14 +135,19 @@ public class OrderService {
         return new OrderResponseDto(order);
     }
 
-    public Page<OrderResponseDto> findByStoreAndDate(String storeId, LocalDate date, Pageable pageable) {
-        LocalDateTime start = date.minusDays(100).atStartOfDay();
-        LocalDateTime end = date.plusDays(1).atStartOfDay();
+    public Page<OrderResponseDto> findByStoreAndDate(String storeId, Integer size, Integer page) {
+        LocalDate date = LocalDate.now();
+
+        ZoneId zone = ZoneId.of("America/Sao_Paulo");
+        LocalDate today = LocalDate.now(zone);
+        LocalDateTime start = LocalDateTime.MIN; // 2025-10-09T00:00 no fuso de São Paulo
+        LocalDateTime end = today.atTime(LocalTime.MAX);
 
         System.out.println(start);
         System.out.println(end);
 
-        return orderRepository.findAllByStoreIdAndCreatedAtBetween(storeId, start, end, pageable)
-                .map(OrderResponseDto::fromEntity);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return orderRepository.findAllByStoreIdAndCreatedAtBetween(storeId, start, end, pageable).map(OrderResponseDto::fromEntity);
     }
 }

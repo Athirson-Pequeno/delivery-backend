@@ -23,7 +23,7 @@ public record StoreProductsDto(String id, String storeSlug, String name, Address
                 store.getPhoneNumber(),
                 products.stream().map(ProductDto::category).sorted().distinct().collect(Collectors.toList()),
                 store.getProducts().stream().map(Product::getCategory).sorted().distinct().collect(Collectors.toList()),
-                new PageResponseDto<>(products.getContent(), products)
+                new PageResponseDto<>(products)
         );
     }
 }

@@ -13,9 +13,20 @@ public record PageResponseDto<T>(
         int totalPages,
         Pageable pageable
 ) {
-    public PageResponseDto(List<T> content, Page<?> page) {
+    public PageResponseDto(List<T> content, Page<T> page) {
         this(
                 content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.getPageable()
+        );
+    }
+
+    public PageResponseDto(Page<T> page) {
+        this(
+                page.getContent(),
                 page.getNumber(),
                 page.getSize(),
                 page.getTotalElements(),

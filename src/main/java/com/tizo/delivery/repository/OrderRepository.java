@@ -22,5 +22,5 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     void deleteOrderById(String id);
 
-    Page<Order> findAllByStoreIdAndCreatedAtBetween(String storeId, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore, Pageable sort);
+    Page<Order> findAllByStoreIdAndCreatedAtBetween(String storeId, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore, Pageable pageable);
 }

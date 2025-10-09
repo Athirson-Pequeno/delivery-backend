@@ -5,9 +5,9 @@ import com.tizo.delivery.model.dto.order.OrderRequestDto;
 import com.tizo.delivery.model.dto.order.OrderResponseDto;
 import com.tizo.delivery.service.OrderService;
 import com.tizo.delivery.util.OrderModelAssembler;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -61,14 +61,15 @@ public class OrderController {
     }
 
     @GetMapping("/days/{storeId}")
-    public ResponseEntity<Page<OrderResponseDto>> getOrdersByDate(
+    public ResponseEntity<PageResponseDto<OrderResponseDto>> getOrdersByDate(
             @PathVariable String storeId,
-            Pageable pageable
-    ) {
-        LocalDate  date = LocalDate.now();
+            @RequestParam(defaultValue = "0") @Min(0) Integer page,
+            @RequestParam(defaultValue = "50") @Max(50) Integer size) {
 
-        Page<OrderResponseDto> page = orderService.findByStoreAndDate(storeId, date, pageable);
-        return ResponseEntity.ok(page);
+
+        Page<OrderResponseDto> p = orderService.findByStoreAndDate(storeId, size, page);
+        PageResponseDto<OrderResponseDto> pageResponseDto = new PageResponseDto<>(p);
+        return ResponseEntity.ok(pageResponseDto);
     }
 
 }
