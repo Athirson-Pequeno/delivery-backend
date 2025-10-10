@@ -18,10 +18,9 @@ public record RegisterStoreDto(
         String password,
 
         @NotBlank
-        @Size(max = 255)
-        Address address,
+        @Size(max = 15)
+        String phoneNumber,
 
         @NotBlank
-        @Size(max = 15)
-        String phoneNumber) {
-}
+        @Size(max = 255)
+        Address address) { }

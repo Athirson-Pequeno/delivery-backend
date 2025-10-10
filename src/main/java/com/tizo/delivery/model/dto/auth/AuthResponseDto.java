@@ -1,4 +1,4 @@
-package com.tizo.delivery.model.dto.auth;
+    package com.tizo.delivery.model.dto.auth;
 
-public record AuthResponseDto(String accessToken, String refreshToken, String storeId, String storeSlug) {
-}
+    public record AuthResponseDto(String accessToken, String refreshToken, String storeId, String storeSlug) {
+    }
