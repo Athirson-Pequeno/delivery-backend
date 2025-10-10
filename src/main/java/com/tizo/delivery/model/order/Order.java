@@ -4,6 +4,7 @@ import com.tizo.delivery.model.store.Store;
 import com.tizo.delivery.model.enums.OrderStatus;
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +24,9 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     private String observation;
 
@@ -65,19 +66,19 @@ public class Order {
         this.orderStatus = orderStatus;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 

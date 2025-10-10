@@ -20,12 +20,6 @@ public class StoreController {
         this.storeService = storeService;
     }
 
-    @PostMapping("/signing")
-    public ResponseEntity<ResponseStoreDto> signingStore(@RequestBody RegisterStoreDto registerStoreDto) {
-        ResponseStoreDto store = storeService.createStore(registerStoreDto);
-        return new ResponseEntity<>(store, HttpStatus.CREATED);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<StoreProductsDto> findById(
             @PathVariable String id,

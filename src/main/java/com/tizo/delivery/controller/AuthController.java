@@ -3,7 +3,10 @@ package com.tizo.delivery.controller;
 import com.tizo.delivery.model.dto.auth.AuthCredentialsDto;
 import com.tizo.delivery.model.dto.auth.AuthResponseDto;
 import com.tizo.delivery.model.dto.auth.RefreshRequestDto;
+import com.tizo.delivery.model.dto.store.RegisterStoreDto;
+import com.tizo.delivery.model.dto.store.ResponseStoreDto;
 import com.tizo.delivery.service.AuthService;
+import com.tizo.delivery.service.StoreService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +18,17 @@ public class AuthController {
 
     private final AuthService authService;
 
-    public AuthController(AuthService authService) {
+    private final StoreService storeService;
+
+    public AuthController(AuthService authService, StoreService storeService) {
         this.authService = authService;
+        this.storeService = storeService;
+    }
+
+    @PostMapping("/signing")
+    public ResponseEntity<ResponseStoreDto> signingStore(@RequestBody RegisterStoreDto registerStoreDto) {
+        ResponseStoreDto store = storeService.createStore(registerStoreDto);
+        return new ResponseEntity<>(store, HttpStatus.CREATED);
     }
 
     @PostMapping("/register/manager/{storeId}")

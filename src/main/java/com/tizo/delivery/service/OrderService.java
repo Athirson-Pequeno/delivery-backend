@@ -23,10 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,8 +65,8 @@ public class OrderService {
         order.setId(orderId);
         order.setStore(store);
         order.setOrderStatus(OrderStatus.PENDING);
-        order.setCreatedAt(LocalDateTime.now());
-        order.setUpdatedAt(LocalDateTime.now());
+        order.setCreatedAt(Instant.now());
+        order.setUpdatedAt(Instant.now());
         order.setCustomerInfos(orderRequestDto.customerInfo());
         order.setObservation(orderRequestDto.observation());
 
@@ -136,15 +133,8 @@ public class OrderService {
     }
 
     public Page<OrderResponseDto> findByStoreAndDate(String storeId, Integer size, Integer page) {
-        LocalDate date = LocalDate.now();
-
-        ZoneId zone = ZoneId.of("America/Sao_Paulo");
-        LocalDate today = LocalDate.now(zone);
-        LocalDateTime start = LocalDateTime.MIN; // 2025-10-09T00:00 no fuso de São Paulo
-        LocalDateTime end = today.atTime(LocalTime.MAX);
-
-        System.out.println(start);
-        System.out.println(end);
+        Instant start = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant end = Instant.now();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 

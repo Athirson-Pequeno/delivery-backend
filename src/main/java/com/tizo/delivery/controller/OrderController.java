@@ -14,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
 @RestController
 @RequestMapping("/api/v1/orders")
 public class OrderController {
@@ -60,15 +58,14 @@ public class OrderController {
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
-    @GetMapping("/days/{storeId}")
+    @GetMapping("/{storeId}/today")
     public ResponseEntity<PageResponseDto<OrderResponseDto>> getOrdersByDate(
             @PathVariable String storeId,
             @RequestParam(defaultValue = "0") @Min(0) Integer page,
             @RequestParam(defaultValue = "50") @Max(50) Integer size) {
 
-
-        Page<OrderResponseDto> p = orderService.findByStoreAndDate(storeId, size, page);
-        PageResponseDto<OrderResponseDto> pageResponseDto = new PageResponseDto<>(p);
+        Page<OrderResponseDto> orders = orderService.findByStoreAndDate(storeId, size, page);
+        PageResponseDto<OrderResponseDto> pageResponseDto = new PageResponseDto<>(orders);
         return ResponseEntity.ok(pageResponseDto);
     }
 

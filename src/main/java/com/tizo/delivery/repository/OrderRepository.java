@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.net.http.HttpHeaders;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,5 +23,5 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     void deleteOrderById(String id);
 
-    Page<Order> findAllByStoreIdAndCreatedAtBetween(String storeId, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore, Pageable pageable);
+    Page<Order> findAllByStoreIdAndCreatedAtBetween(String storeId, Instant createdAtAfter, Instant createdAtBefore, Pageable pageable);
 }

@@ -6,6 +6,7 @@ import com.tizo.delivery.model.order.OrderItem;
 import com.tizo.delivery.model.order.Payment;
 import com.tizo.delivery.model.enums.OrderStatus;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,8 +15,8 @@ public record OrderResponseDto(
         String id,
         String storeName,
         OrderStatus orderStatus,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
+        Instant createdAt,
+        Instant updatedAt,
         String observation,
         Payment payment,
         CustomerInfo customerInfo,
