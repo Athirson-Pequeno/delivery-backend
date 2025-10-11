@@ -4,6 +4,7 @@ import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.tizo.delivery.model.dto.order.OrderItemRequestDto;
 import com.tizo.delivery.service.PaymentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/payments")
+@Tag(name = "Pagamentos", description = "Endpoints para gerenciamento de pagamentos")
 public class PaymentController {
 
     private final PaymentService paymentService;
