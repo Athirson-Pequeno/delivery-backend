@@ -1,5 +1,6 @@
 package com.tizo.delivery.controller;
 
+import com.tizo.delivery.docs.ExampleJsons;
 import com.tizo.delivery.model.dto.auth.AuthCredentialsDto;
 import com.tizo.delivery.model.dto.auth.AuthResponseDto;
 import com.tizo.delivery.model.dto.auth.RefreshRequestDto;
@@ -36,31 +37,7 @@ public class AuthController {
 
     @Operation(summary = "Cadastrar nova loja", description = "Cria uma nova loja no sistema")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Loja criada com sucesso",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseStoreDto.class),
-                            examples = @ExampleObject(
-                                    value = "{\n" +
-                                            "    \"id\": \"5eea5710-b410-4192-85e0-d6ceb863a1eb\",\n" +
-                                            "    \"name\": \"Bar da carne\",\n" +
-                                            "    \"slug\": \"bar-da-carne\",\n" +
-                                            "    \"phoneNumber\": \"5511999998888\",\n" +
-                                            "    \"address\": {\n" +
-                                            "        \"street\": \"Rua1\",\n" +
-                                            "        \"number\": \"01\",\n" +
-                                            "        \"neighborhood\": \"Bairro Y\",\n" +
-                                            "        \"city\": \"Cidade X\",\n" +
-                                            "        \"cep\": \"54321-000\"\n" +
-                                            "    }\n" +
-                                            "}"
-                            )
-                    )),
-            @ApiResponse(responseCode = "400", description = "Requisição inválida",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "O email enviado já está cadastrado.",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "201", description = "Loja criada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseStoreDto.class), examples = @ExampleObject(value = ExampleJsons.STORE_CREATED_RESPONSE))), @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))), @ApiResponse(responseCode = "409", description = "O email enviado já está cadastrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/store/signing")
     public ResponseEntity<ResponseStoreDto> signingStore(@RequestBody RegisterStoreDto registerStoreDto) {
@@ -70,18 +47,7 @@ public class AuthController {
 
     @Operation(summary = "Registrar gerente", description = "Registra um gerente para a loja informada (role MANAGER)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Gerente registrado com sucesso",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponseDto.class),
-                            examples = @ExampleObject(
-                                    value = "{\n" +
-                                            "  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n" +
-                                            "  \"refreshToken\": \"dGhpcy1pcy1hLXJlZnJlc2gtdG9rZW4=\",\n" +
-                                            "  \"storeId\": \"123\",\n" +
-                                            "  \"storeSlug\": \"loja-exemplo\"\n" +
-                                            "}"
-                            )
-                    )),
+            @ApiResponse(responseCode = "201", description = "Gerente registrado com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Loja não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Conflito (email já existe)", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -98,9 +64,7 @@ public class AuthController {
 
     @Operation(summary = "Registrar funcionário", description = "Registra um funcionário para a loja informada (role EMPLOYEE)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Funcionário registrado com sucesso",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponseDto.class))),
+            @ApiResponse(responseCode = "201", description = "Funcionário registrado com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Loja não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Conflito (email já existe)", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -117,8 +81,7 @@ public class AuthController {
 
     @Operation(summary = "Login", description = "Autentica usuário e retorna tokens de acesso")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDto.class))),
+            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -131,8 +94,7 @@ public class AuthController {
 
     @Operation(summary = "Atualizar token", description = "Gera um novo token a partir do refresh token")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Token atualizado com sucesso",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDto.class))),
+            @ApiResponse(responseCode = "200", description = "Token atualizado com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Refresh token inválido ou expirado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

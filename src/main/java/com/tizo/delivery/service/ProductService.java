@@ -41,16 +41,11 @@ public class ProductService {
         this.jwtService = jwtService;
     }
 
+
     @Transactional
     public ProductDto addProductToStore(ProductDto productDto, String storeId, MultipartFile productImage, String token) throws IOException {
-        String userEmail = jwtService.extractEmail(token);
 
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new EntityNotFoundException("Loja não encontrada, id: " + storeId));
-
-        if (store.getUsers().stream().map(StoreUser::getEmail).noneMatch(email -> email.equals(userEmail))) {
-            throw new HttpForbiddenException();
-        }
+        Store store = validateStore(storeId, token);
 
         Product product = new Product();
         product.setName(productDto.name());
@@ -96,6 +91,7 @@ public class ProductService {
         return new ProductDto(createdProduct);
     }
 
+
     public ProductDto getProductById(String storeId, Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado, id: " + productId));
@@ -115,7 +111,10 @@ public class ProductService {
 
     }
 
-    public ProductDto updateProduct(ProductDto productDto, Long productId, String storeId, MultipartFile productImage) throws IOException {
+    public ProductDto updateProduct(ProductDto productDto, Long productId, String storeId, MultipartFile productImage, String token) throws IOException {
+
+        validateStore(storeId, token);
+
         Product product = productRepository.findById(productId).orElseThrow(() ->
                 new EntityNotFoundException("Produto não encontrado, id: " + productId));
 
@@ -136,10 +135,13 @@ public class ProductService {
         return new ProductDto(updatedProduct);
     }
 
-    public boolean deleteProduct(Long productId, String storeId) throws IOException {
+    public boolean deleteProduct(Long productId, String storeId, String token) {
+
+        validateStore(storeId, token);
 
         Product product = productRepository.findById(productId).orElseThrow(() ->
                 new EntityNotFoundException("Produto não encontrado, id: " + productId));
+
         if (!product.getStore().getId().equals(storeId)) {
             throw new HttpForbiddenException();
         }
@@ -178,5 +180,18 @@ public class ProductService {
                 .map(ProductDto::category)
                 .distinct()
                 .toList();
+    }
+
+    private Store validateStore(String storeId, String token) {
+        String userEmail = jwtService.extractEmail(token);
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new EntityNotFoundException("Loja não encontrada, id: " + storeId));
+
+        if (store.getUsers().stream().map(StoreUser::getEmail).noneMatch(email -> email.equals(userEmail))) {
+            throw new HttpForbiddenException();
+        }
+
+        return store;
     }
 }
