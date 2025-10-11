@@ -53,9 +53,9 @@ Arquivo `application.properties`:
 ```properties
 spring.application.name=Delivery
 
-spring.datasource.url=jdbc:mysql://127.0.0.1:3306/delivery
-spring.datasource.username=root
-spring.datasource.password=asp36412
+spring.datasource.url=jdbc:mysql://localhost:3306/delivery
+spring.datasource.username=user
+spring.datasource.password=password
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
@@ -82,7 +82,7 @@ springdoc.packages-to-scan=com.tizo.delivery.controller
 1. Clone o repositório:
 
 ```bash
-git clone https://github.com/SeuUsuario/Delivery.git
+git clone https://github.com/Athirson-Pequeno/delivery-backend.git
 cd Delivery
 ```
 
