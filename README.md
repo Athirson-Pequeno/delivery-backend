@@ -10,7 +10,7 @@ Delivery é uma aplicação backend em **Java 21** usando **Spring Boot 3.5.4**,
 
 ---
 
-## 🛠 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Java 21**
 - **Spring Boot 3.5.4**
@@ -32,7 +32,7 @@ Delivery é uma aplicação backend em **Java 21** usando **Spring Boot 3.5.4**,
 
 ---
 
-## ⚙️ Pré-requisitos
+## Pré-requisitos
 
 - Java 21
 - Maven 4+

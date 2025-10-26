@@ -1,8 +1,9 @@
 package com.tizo.delivery.model.store;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.tizo.delivery.model.product.Product;
+import com.tizo.delivery.model.delivery.Delivery;
 import com.tizo.delivery.model.order.Order;
+import com.tizo.delivery.model.product.Product;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -41,6 +42,9 @@ public class Store {
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Order> orders = new HashSet<>();
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Delivery> deliveries = new HashSet<>();
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -107,6 +111,14 @@ public class Store {
 
     public Set<Product> getProducts() {
         return products;
+    }
+
+    public Set<Delivery> getDeliveries() {
+        return deliveries;
+    }
+
+    public void setDeliveries(Set<Delivery> deliveries) {
+        this.deliveries = deliveries;
     }
 
     public void setProducts(Set<Product> products) {
