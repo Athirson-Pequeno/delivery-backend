@@ -4,6 +4,7 @@ import com.tizo.delivery.docs.ExampleJsons;
 import com.tizo.delivery.model.dto.auth.AuthCredentialsDto;
 import com.tizo.delivery.model.dto.auth.AuthResponseDto;
 import com.tizo.delivery.model.dto.auth.RefreshRequestDto;
+import com.tizo.delivery.model.dto.auth.StoreSigingResponseDto;
 import com.tizo.delivery.model.dto.store.RegisterStoreDto;
 import com.tizo.delivery.model.dto.store.ResponseStoreDto;
 import com.tizo.delivery.model.exception.ErrorResponse;
@@ -40,8 +41,8 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "Loja criada com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseStoreDto.class), examples = @ExampleObject(value = ExampleJsons.STORE_CREATED_RESPONSE))), @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))), @ApiResponse(responseCode = "409", description = "O email enviado já está cadastrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/store/signing")
-    public ResponseEntity<ResponseStoreDto> signingStore(@RequestBody RegisterStoreDto registerStoreDto) {
-        ResponseStoreDto store = storeService.createStore(registerStoreDto);
+    public ResponseEntity<StoreSigingResponseDto> signingStore(@RequestBody RegisterStoreDto registerStoreDto) {
+        StoreSigingResponseDto store = storeService.createStore(registerStoreDto);
         return new ResponseEntity<>(store, HttpStatus.CREATED);
     }
 
